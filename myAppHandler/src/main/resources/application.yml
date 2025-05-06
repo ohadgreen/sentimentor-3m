@@ -1,0 +1,11 @@
+server:
+  port: 8081
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+youtube:
+  api:
+    key: ${YOUTUBE_API_KEY}
