@@ -22,8 +22,19 @@ public class CommentsPersistInMongo implements CommentsPersistence {
     }
 
     @Override
-    public List<ConciseComment> getCommentsByVideoId(String videoId, int limit) {
-        return conciseCommentRepository.findTopRatedCommentsByVideoId(videoId, PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "likeCount")));
+    public List<ConciseComment> getCommentsPageByVideoId(String videoId, Pageable pageable) {
+        Sort defaultSort = Sort.by(
+                Sort.Order.desc("likeCount"),
+                Sort.Order.desc("publishedAt")
+        );
+
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pageable.getSort().isSorted() ? pageable.getSort() : defaultSort
+        );
+
+        return conciseCommentRepository.findConciseCommentByVideoId(videoId, sortedPageable);
     }
 
     @Override

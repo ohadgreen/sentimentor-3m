@@ -1,14 +1,16 @@
 package common.model.analysisrequest;
 
 import java.util.List;
+import java.util.UUID;
 
 public class SentimentAnalysisRequest {
+    private UUID analysisId;
     private String videoId;
-    private int commentCount;
     private String analysisObject;
+    private int commentCount;
     private String videoTitle;
     private String moreInfo;
-    List<CommentToAnalyze> comments;
+
 
     public SentimentAnalysisRequest(String videoId, int commentCount, String analysisObject, String videoTitle) {
         this.videoId = videoId;
@@ -17,11 +19,18 @@ public class SentimentAnalysisRequest {
         this.videoTitle = videoTitle;
     }
 
-    public SentimentAnalysisRequest(String analysisObject, String videoTitle, String moreInfo, List<CommentToAnalyze> comments) {
+    public SentimentAnalysisRequest(String analysisObject, String videoTitle, String moreInfo) {
         this.analysisObject = analysisObject;
         this.videoTitle = videoTitle;
         this.moreInfo = moreInfo;
-        this.comments = comments;
+    }
+
+    public UUID getAnalysisId() {
+        return analysisId;
+    }
+
+    public void setAnalysisId(UUID analysisId) {
+        this.analysisId = analysisId;
     }
 
     public String getVideoId() {
@@ -62,14 +71,6 @@ public class SentimentAnalysisRequest {
 
     public void setMoreInfo(String moreInfo) {
         this.moreInfo = moreInfo;
-    }
-
-    public List<CommentToAnalyze> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<CommentToAnalyze> comments) {
-        this.comments = comments;
     }
 
 }

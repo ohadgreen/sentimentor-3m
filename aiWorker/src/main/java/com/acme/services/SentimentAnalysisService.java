@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import common.model.analysisrequest.CommentSentiment;
+import common.model.analysisrequest.SentimentAnalysisChunkRequest;
 import common.model.analysisrequest.SentimentAnalysisRequest;
 import common.model.analysisrequest.SentimentAnalysisResponse;
 import org.slf4j.Logger;
@@ -33,7 +34,18 @@ public class SentimentAnalysisService {
         this.chatModel = chatModel;
     }
 
-    public SentimentAnalysisResponse analyzeCommentsChunk(SentimentAnalysisRequest analysisRequest) {
+    public void communicateAnalysisResponseFromRequest(SentimentAnalysisChunkRequest analysisRequest) {
+        SentimentAnalysisResponse response = analyzeCommentsChunk(analysisRequest);
+        if (response != null) {
+            // Here you would typically send the response back to the requester or store it in a database
+            logger.info("Sentiment analysis completed for request: {}", analysisRequest.getVideoId());
+        } else {
+            logger.error("Failed to analyze comments for request: {}", analysisRequest.getVideoId());
+        }
+
+    }
+
+    public SentimentAnalysisResponse analyzeCommentsChunk(SentimentAnalysisChunkRequest analysisRequest) {
 
         String allComments = analysisRequest.getComments().stream()
                 .map(comment -> "\"" + comment.getCommentId() + "\": \"" + comment.getCommentText() + "\"")

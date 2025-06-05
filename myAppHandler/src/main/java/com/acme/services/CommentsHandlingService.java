@@ -29,7 +29,7 @@ public class CommentsHandlingService {
     }
 
     public List<ConciseComment> getConciseCommentList(String videoId, int limit) {
-        return commentsPersistence.getCommentsByVideoId(videoId, Pageable.ofSize(limit));
+        return commentsPersistence.getCommentsPageByVideoId(videoId, Pageable.ofSize(limit));
     }
 
     public void handleGetCommentList(VideoCommentsRequest videoCommentsRequest) {

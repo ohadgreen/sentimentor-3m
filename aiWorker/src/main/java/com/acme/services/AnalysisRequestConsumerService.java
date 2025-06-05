@@ -12,6 +12,7 @@ public class AnalysisRequestConsumerService {
     private final RequestQueueService queueService;
     private final SentimentAnalysisService analysisService;
     private final Executor consumerExecutor;
+    private static final int CONSUMER_COUNT = 5;
 
     public AnalysisRequestConsumerService(RequestQueueService queueService,
                                           SentimentAnalysisService analysisService,
@@ -23,7 +24,7 @@ public class AnalysisRequestConsumerService {
 
     @PostConstruct
     public void startConsumers() {
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < CONSUMER_COUNT; i++) {
             consumerExecutor.execute(this::consume);
         }
     }

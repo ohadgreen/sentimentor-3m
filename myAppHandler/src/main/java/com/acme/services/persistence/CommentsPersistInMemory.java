@@ -31,10 +31,9 @@ public class CommentsPersistInMemory implements CommentsPersistence {
     }
 
     @Override
-    public List<ConciseComment> getCommentsByVideoId(String videoId, Pageable pageable) {
+    public List<ConciseComment> getCommentsPageByVideoId(String videoId, Pageable pageable) {
         List<ConciseComment> conciseCommentList = conciseCommentsMap.get(videoId);
 
-        // return a list of conciseComments sorted by likeCount descending and then by publishedAt ascending
         if (conciseCommentList == null || conciseCommentList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -47,7 +46,6 @@ public class CommentsPersistInMemory implements CommentsPersistence {
             limit = conciseCommentList.size();
         }
 
-        // Sort the comments by likeCount descending and then by publishedAt ascending
         conciseCommentList.sort(Comparator.comparingInt(ConciseComment::getLikeCount).reversed()
                 .thenComparing(ConciseComment::getPublishedAt));
 

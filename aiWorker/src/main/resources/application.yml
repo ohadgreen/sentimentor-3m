@@ -12,3 +12,7 @@ consumer:
     max-pool-size: ${POOL_MAX_SIZE:8}
     queue-capacity: 100
     keep-alive-seconds: 60
+
+app:
+  handler:
+    path: ${APP_HANDLER_PATH}

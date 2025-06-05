@@ -10,6 +10,5 @@ public interface ConciseCommentRepository extends MongoRepository<ConciseComment
     ConciseComment findConciseCommentByCommentId(String id);
     List<ConciseComment> findConciseCommentByVideoId(String videoId);
     List<ConciseComment> findConciseCommentByVideoId(String videoId, Pageable pageable);
-    List<ConciseComment> findTopRatedCommentsByVideoId(String videoId, Pageable pageable);
     void deleteByVideoId(String videoId);
 }
