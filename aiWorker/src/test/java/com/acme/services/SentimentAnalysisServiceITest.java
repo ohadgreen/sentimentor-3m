@@ -23,7 +23,7 @@ class SentimentAnalysisServiceITest {
     @Test
     void testSentimentAnalysisPrompt() {
 
-        SentimentAnalysisRequest sentimentReqTest = getSentimentAnalysisRequest();
+        SentimentAnalysisChunkRequest sentimentReqTest = getSentimentAnalysisRequest();
 
         SentimentAnalysisResponse response = sentimentAnalysisService.analyzeCommentsChunk(sentimentReqTest);
 
@@ -39,7 +39,7 @@ class SentimentAnalysisServiceITest {
         }
     }
 
-    private static SentimentAnalysisRequest getSentimentAnalysisRequest() {
+    private static SentimentAnalysisChunkRequest getSentimentAnalysisRequest() {
         String analysisObject = "Google";
         String c1 = "Until Veo2 is released to the public, it is just fiction";
         String c2 = "Google is superior!";
@@ -47,7 +47,7 @@ class SentimentAnalysisServiceITest {
         String c4 = "Google products always getting better and better. I love it!";
         String c5 = "No worries! Sundar Pichai knows his stuff. He'll make sure everything is fine.";
 
-        SentimentAnalysisRequest sentimentReqTest = new SentimentAnalysisRequest(
+        SentimentAnalysisChunkRequest sentimentAnalysisChunkRequest = new SentimentAnalysisChunkRequest(
                 analysisObject,
                 "Google AI DEMOLISHES OpenAI! The Ultimate AI Showdown is OVER?",
                 "Google's new video generation model is called Veo 2. SORA is a video generation model created by OpenAI",
@@ -55,9 +55,11 @@ class SentimentAnalysisServiceITest {
                         new CommentToAnalyze("c2", c2),
                         new CommentToAnalyze("c3", c3),
                         new CommentToAnalyze("c4", c4),
-                        new CommentToAnalyze("c5", c5))
+                        new CommentToAnalyze("c5", c5)),
+                0, 0
         );
-        return sentimentReqTest;
+
+        return sentimentAnalysisChunkRequest;
     }
 
 }

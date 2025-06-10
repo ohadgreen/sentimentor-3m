@@ -1,6 +1,5 @@
 package common.model.analysisrequest;
 
-import java.util.List;
 import java.util.UUID;
 
 public class SentimentAnalysisRequest {
@@ -8,6 +7,7 @@ public class SentimentAnalysisRequest {
     private String videoId;
     private String analysisObject;
     private int commentCount;
+    private int pageSize;
     private String videoTitle;
     private String moreInfo;
 
@@ -47,6 +47,14 @@ public class SentimentAnalysisRequest {
 
     public void setCommentCount(int commentCount) {
         this.commentCount = commentCount;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
     }
 
     public String getAnalysisObject() {

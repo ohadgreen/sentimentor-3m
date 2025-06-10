@@ -2,7 +2,6 @@ package com.acme.controllers;
 
 import com.acme.services.RequestQueueService;
 import common.model.analysisrequest.SentimentAnalysisChunkRequest;
-import common.model.analysisrequest.SentimentAnalysisRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

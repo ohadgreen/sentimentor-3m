@@ -12,6 +12,15 @@ public class SentimentAnalysisChunkRequest extends SentimentAnalysisRequest {
         super(videoId, commentCount, analysisObject, videoTitle);
     }
 
+    // Constructor for chunked analysis with comments
+    public SentimentAnalysisChunkRequest(String analysisObject, String videoTitle, String moreInfo, List<CommentToAnalyze> comments, int pageSize, int pageNumber) {
+        super(analysisObject, videoTitle, moreInfo);
+        this.comments = comments;
+        this.pageSize = pageSize;
+        this.pageNumber = pageNumber;
+    }
+
+
     public String getAnalysisChunkId() {
         return analysisChunkId;
     }

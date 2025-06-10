@@ -12,4 +12,4 @@ youtube:
 
 app:
   aiWorker:
-    path: ${AI_WORKER_PATH:http://localhost:8082/api/aiworker}
+    base-url: ${AI_WORKER_PATH:http://localhost:8082/api/aiworker}

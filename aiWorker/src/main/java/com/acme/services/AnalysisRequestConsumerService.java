@@ -1,5 +1,6 @@
 package com.acme.services;
 
+import common.model.analysisrequest.SentimentAnalysisChunkRequest;
 import common.model.analysisrequest.SentimentAnalysisRequest;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -32,7 +33,7 @@ public class AnalysisRequestConsumerService {
     private void consume() {
         while (true) {
             try {
-                SentimentAnalysisRequest request = queueService.dequeue();
+                SentimentAnalysisChunkRequest request = queueService.dequeue();
                 analysisService.analyzeCommentsChunk(request);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

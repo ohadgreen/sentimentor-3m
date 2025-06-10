@@ -1,5 +1,6 @@
 package com.acme.services;
 
+import common.model.analysisrequest.SentimentAnalysisChunkRequest;
 import common.model.analysisrequest.SentimentAnalysisRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -10,17 +11,17 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Service
 public class RequestQueueService {
 
-    private final BlockingQueue<SentimentAnalysisRequest> queue;
+    private final BlockingQueue<SentimentAnalysisChunkRequest> queue;
 
     public RequestQueueService(@Value("${consumer.pool.queue-capacity}") int capacity) {
         this.queue = new LinkedBlockingQueue<>(capacity);
     }
 
-    public void enqueue(SentimentAnalysisRequest request) throws InterruptedException {
+    public void enqueue(SentimentAnalysisChunkRequest request) throws InterruptedException {
         queue.put(request);
     }
 
-    public SentimentAnalysisRequest dequeue() throws InterruptedException {
+    public SentimentAnalysisChunkRequest dequeue() throws InterruptedException {
         return queue.take();
     }
 }
