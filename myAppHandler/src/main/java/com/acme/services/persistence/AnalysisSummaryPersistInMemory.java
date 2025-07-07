@@ -1,6 +1,6 @@
 package com.acme.services.persistence;
 
-import com.acme.model.comment.CommentsAnalyzeSummary;
+import com.acme.model.comment.VideoCommentsSummary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -11,27 +11,27 @@ import java.util.Map;
 @Profile("memory")
 public class AnalysisSummaryPersistInMemory implements AnalysisSummaryPersistence {
 
-    public Map<String, CommentsAnalyzeSummary> commentsAnalyzeSummaryMap = new HashMap<>();
+    public Map<String, VideoCommentsSummary> commentsAnalyzeSummaryMap = new HashMap<>();
     @Override
-    public void saveAnalysisSummary(CommentsAnalyzeSummary commentsAnalyzeSummary) {
-        if (commentsAnalyzeSummaryMap.containsKey(commentsAnalyzeSummary.getVideoId())) {
-            commentsAnalyzeSummaryMap.replace(commentsAnalyzeSummary.getVideoId(), commentsAnalyzeSummary);
+    public void saveAnalysisSummary(VideoCommentsSummary videoCommentsSummary) {
+        if (commentsAnalyzeSummaryMap.containsKey(videoCommentsSummary.getVideoId())) {
+            commentsAnalyzeSummaryMap.replace(videoCommentsSummary.getVideoId(), videoCommentsSummary);
         } else {
-            commentsAnalyzeSummaryMap.put(commentsAnalyzeSummary.getVideoId(), commentsAnalyzeSummary);
+            commentsAnalyzeSummaryMap.put(videoCommentsSummary.getVideoId(), videoCommentsSummary);
         }
     }
 
     @Override
-    public CommentsAnalyzeSummary getCommentsAnalysisSummary(String videoId) {
+    public VideoCommentsSummary getCommentsAnalysisSummary(String videoId) {
         return commentsAnalyzeSummaryMap.get(videoId);
     }
 
     @Override
-    public void updateAnalysisSummary(String videoId, CommentsAnalyzeSummary commentsAnalyzeSummary) {
+    public void updateAnalysisSummary(String videoId, VideoCommentsSummary videoCommentsSummary) {
         if (commentsAnalyzeSummaryMap.containsKey(videoId)) {
-            commentsAnalyzeSummaryMap.replace(videoId, commentsAnalyzeSummary);
+            commentsAnalyzeSummaryMap.replace(videoId, videoCommentsSummary);
         } else {
-            commentsAnalyzeSummaryMap.put(videoId, commentsAnalyzeSummary);
+            commentsAnalyzeSummaryMap.put(videoId, videoCommentsSummary);
         }
     }
 

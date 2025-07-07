@@ -15,15 +15,15 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.List;
 
 @Service
-public class GetRawCommentService {
-    Logger logger = LoggerFactory.getLogger(GetRawCommentService.class);
+public class GetYouTubeRawComments {
+    Logger logger = LoggerFactory.getLogger(GetYouTubeRawComments.class);
 
     @Value("${youtube.api.key}")
     private String API_KEY;
-    private static final String COMMENT_THREADS_BASE_API = "https://youtube.googleapis.com/youtube/v3/commentThreads";
+    @Value("${youtube.api.base-url}")
+    private String COMMENT_THREADS_BASE_API;
     private static final int MAX_RESULTS = 50;
 
     public CommentThread getRawCommentsFromYouTube(String videoId, Integer commentsInPage, @Nullable String nextPageToken) {

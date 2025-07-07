@@ -1,7 +1,7 @@
 package com.acme.services;
 
 import com.acme.model.comment.CommentDto;
-import com.acme.model.comment.CommentsAnalyzeSummary;
+import com.acme.model.comment.VideoCommentsSummary;
 import com.acme.model.comment.ConciseComment;
 import com.acme.services.persistence.AnalysisSummaryPersistence;
 import com.acme.services.persistence.CommentsPersistence;
@@ -21,8 +21,8 @@ public class AnalysisSummaryService {
         this.commentsPersistence = commentsPersistence;
     }
 
-    public CommentsAnalyzeSummary getCommentsAnalysisSummary(String videoId) {
-        CommentsAnalyzeSummary commentsAnalysisSummary = analysisSummaryPersistence.getCommentsAnalysisSummary(videoId);
+    public VideoCommentsSummary getCommentsAnalysisSummary(String videoId) {
+        VideoCommentsSummary commentsAnalysisSummary = analysisSummaryPersistence.getCommentsAnalysisSummary(videoId);
 
         List<ConciseComment> topComments = commentsPersistence.getCommentsPageByVideoId(videoId, Pageable.ofSize(MAX_TOP_COMMENTS));
         List<CommentDto> topCommentsDtoList = topComments.stream().map(this::convertConciseCommentToCommentDto).toList();

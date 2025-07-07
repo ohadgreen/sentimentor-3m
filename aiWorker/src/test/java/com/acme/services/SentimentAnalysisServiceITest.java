@@ -25,7 +25,7 @@ class SentimentAnalysisServiceITest {
 
         SentimentAnalysisChunkRequest sentimentReqTest = getSentimentAnalysisRequest();
 
-        SentimentAnalysisResponse response = sentimentAnalysisService.analyzeCommentsChunk(sentimentReqTest);
+        SentimentAnalysisChunkResponse response = sentimentAnalysisService.analyzeCommentsChunk(sentimentReqTest);
 
         assertNotNull(response, "Response should not be null");
         assertNotNull(response.getSentimentAnalysisId(), "Response ID should be generated");

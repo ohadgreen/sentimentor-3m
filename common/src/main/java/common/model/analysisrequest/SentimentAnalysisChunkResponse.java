@@ -4,12 +4,14 @@ package common.model.analysisrequest;
 import java.util.List;
 import java.util.UUID;
 
-public class SentimentAnalysisResponse {
+public class SentimentAnalysisChunkResponse {
     private UUID sentimentAnalysisId;
+    private UUID analysisChunkId;
     private List<CommentSentiment> commentSentiments;
 
-    public SentimentAnalysisResponse(UUID sentimentAnalysisId, List<CommentSentiment> commentSentiments) {
+    public SentimentAnalysisChunkResponse(UUID sentimentAnalysisId, UUID analysisChunkId, List<CommentSentiment> commentSentiments) {
         this.sentimentAnalysisId = sentimentAnalysisId;
+        this.analysisChunkId = analysisChunkId;
         this.commentSentiments = commentSentiments;
     }
 
@@ -21,6 +23,12 @@ public class SentimentAnalysisResponse {
         this.sentimentAnalysisId = sentimentAnalysisId;
     }
 
+    public UUID getAnalysisChunkId() {
+        return analysisChunkId;
+    }
+    public void setAnalysisChunkId(UUID analysisChunkId) {
+        this.analysisChunkId = analysisChunkId;
+    }
     public List<CommentSentiment> getCommentSentiments() {
         return commentSentiments;
     }

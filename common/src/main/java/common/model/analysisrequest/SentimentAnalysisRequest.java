@@ -5,18 +5,19 @@ import java.util.UUID;
 public class SentimentAnalysisRequest {
     private UUID analysisId;
     private String videoId;
-    private String analysisObject;
-    private int commentCount;
-    private int pageSize;
     private String videoTitle;
+    private String analysisObject;
     private String moreInfo;
+    private int totalCommentsToAnalyze;
 
 
-    public SentimentAnalysisRequest(String videoId, int commentCount, String analysisObject, String videoTitle) {
+    public SentimentAnalysisRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze) {
+        this.analysisId = analysisId;
         this.videoId = videoId;
-        this.commentCount = commentCount;
-        this.analysisObject = analysisObject;
         this.videoTitle = videoTitle;
+        this.analysisObject = analysisObject;
+        this.moreInfo = moreInfo;
+        this.totalCommentsToAnalyze = totalCommentsToAnalyze;
     }
 
     public SentimentAnalysisRequest(String analysisObject, String videoTitle, String moreInfo) {
@@ -41,20 +42,12 @@ public class SentimentAnalysisRequest {
         this.videoId = videoId;
     }
 
-    public int getCommentCount() {
-        return commentCount;
+    public int getTotalCommentsToAnalyze() {
+        return totalCommentsToAnalyze;
     }
 
-    public void setCommentCount(int commentCount) {
-        this.commentCount = commentCount;
-    }
-
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
+    public void setTotalCommentsToAnalyze(int totalCommentsToAnalyze) {
+        this.totalCommentsToAnalyze = totalCommentsToAnalyze;
     }
 
     public String getAnalysisObject() {

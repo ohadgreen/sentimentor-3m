@@ -2,8 +2,7 @@ package com.acme.controllers;
 
 import com.acme.services.SentimentAnalysisService;
 import common.model.analysisrequest.SentimentAnalysisChunkRequest;
-import common.model.analysisrequest.SentimentAnalysisRequest;
-import common.model.analysisrequest.SentimentAnalysisResponse;
+import common.model.analysisrequest.SentimentAnalysisChunkResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +18,7 @@ public class SentimentAnalysisController {
     }
 
     @PostMapping("/comments")
-    public SentimentAnalysisResponse analyzeCommentsSentiment(@RequestBody SentimentAnalysisChunkRequest sentimentAnalysisRequest) {
+    public SentimentAnalysisChunkResponse analyzeCommentsSentiment(@RequestBody SentimentAnalysisChunkRequest sentimentAnalysisRequest) {
         return sentimentAnalysisService.analyzeCommentsChunk(sentimentAnalysisRequest);
     }
 }

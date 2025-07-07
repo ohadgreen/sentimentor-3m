@@ -1,7 +1,7 @@
 package com.acme.services;
 
 import com.acme.model.analysisreq.VideoCommentsRequest;
-import com.acme.model.comment.CommentsAnalyzeSummary;
+import com.acme.model.comment.VideoCommentsSummary;
 import com.acme.model.comment.ConciseComment;
 import com.acme.model.ytrawcomment.Comment;
 import com.acme.model.ytrawcomment.CommentThread;
@@ -14,15 +14,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class CommentsHandlingService {
-    private final GetRawCommentService getRawCommentService;
+public class RawCommentsService {
+    private final GetYouTubeRawComments getYouTubeRawComments;
     private final CommentsPersistence commentsPersistence;
     private final AnalysisSummaryPersistence analysisSummaryPersistence;
     private final WordCountService wordCountService;
     private static final int MAX_WORDS_FREQUENCIES = 10;
 
-    public CommentsHandlingService(GetRawCommentService getRawCommentService, CommentsPersistence commentsPersistence, AnalysisSummaryPersistence analysisSummaryPersistence, WordCountService wordCountService) {
-        this.getRawCommentService = getRawCommentService;
+    public RawCommentsService(GetYouTubeRawComments getYouTubeRawComments, CommentsPersistence commentsPersistence, AnalysisSummaryPersistence analysisSummaryPersistence, WordCountService wordCountService) {
+        this.getYouTubeRawComments = getYouTubeRawComments;
         this.commentsPersistence = commentsPersistence;
         this.analysisSummaryPersistence = analysisSummaryPersistence;
         this.wordCountService = wordCountService;
@@ -32,7 +32,7 @@ public class CommentsHandlingService {
         return commentsPersistence.getCommentsPageByVideoId(videoId, Pageable.ofSize(limit));
     }
 
-    public void handleGetCommentList(VideoCommentsRequest videoCommentsRequest) {
+    public void getRawVideoComments(VideoCommentsRequest videoCommentsRequest) {
         String videoId = videoCommentsRequest.getVideoId();
         int totalCommentsCount = 0;
         String nextPageToken = null;
@@ -40,10 +40,10 @@ public class CommentsHandlingService {
         List<ConciseComment> allConciseComments = new ArrayList<>();
 
         Map<String, Integer> wordCount = new HashMap<>();
-        TreeMap<Integer, List<String>> sortedCountsMap = new TreeMap<>(Collections.reverseOrder());;
+        TreeMap<Integer, List<String>> sortedWordCountsMap = new TreeMap<>(Collections.reverseOrder());
 
         do {
-            CommentThread rawCommentsFromYouTube = getRawCommentService.getRawCommentsFromYouTube(videoId, videoCommentsRequest.getCommentsInPage(), nextPageToken);
+            CommentThread rawCommentsFromYouTube = getYouTubeRawComments.getRawCommentsFromYouTube(videoId, videoCommentsRequest.getCommentsInPage(), nextPageToken);
             List<Comment> comments = rawCommentsFromYouTube.getComments();
 
             if (comments == null || comments.isEmpty()) {
@@ -53,7 +53,7 @@ public class CommentsHandlingService {
             List<ConciseComment> conciseCommentList = comments.stream().map(rawComment -> getConciseCommentFromComment(rawComment, videoId)).toList();
 
             List<String> commentsForWordsCount = conciseCommentList.stream().map(ConciseComment::getTextDisplay).collect(Collectors.toList());
-            wordCountService.wordsCount(wordCount, sortedCountsMap, commentsForWordsCount);
+            wordCountService.wordsCount(wordCount, sortedWordCountsMap, commentsForWordsCount);
 
             totalCommentsCount += comments.size();
             allConciseComments.addAll(conciseCommentList);
@@ -63,13 +63,19 @@ public class CommentsHandlingService {
         } while (totalCommentsCount < videoCommentsRequest.getTotalCommentsRequired() && nextPageToken != null);
 
         commentsPersistence.saveConciseComments(allConciseComments);
-        createAndSaveAnalysisSummary(videoId, totalCommentsCount, sortedCountsMap);
+
+        VideoCommentsSummary videoCommentsSummary = new VideoCommentsSummary();
+        videoCommentsSummary.setVideoId(videoId);
+        videoCommentsSummary.setTotalComments(totalCommentsCount);
+        videoCommentsSummary.setWordsFrequency(calculateTopWordsFrequencies(sortedWordCountsMap));
+
+        analysisSummaryPersistence.saveAnalysisSummary(videoCommentsSummary);
     }
 
-    protected void createAndSaveAnalysisSummary(String videoId, int totalCommentsCount, TreeMap<Integer, List<String>> sortedCountsMap) {
+    protected LinkedHashMap<String, Integer> calculateTopWordsFrequencies(TreeMap<Integer, List<String>> sortedWordCountsMap) {
         LinkedHashMap<String, Integer> topWordsFrequencyMap = new LinkedHashMap<>();
         int count = 0;
-        for (Map.Entry<Integer, List<String>> entry : sortedCountsMap.entrySet()) {
+        for (Map.Entry<Integer, List<String>> entry : sortedWordCountsMap.entrySet()) {
             for (String word : entry.getValue()) {
                 topWordsFrequencyMap.put(word, entry.getKey());
                 count++;
@@ -77,17 +83,19 @@ public class CommentsHandlingService {
                     break;
                 }
             }
-            if (count >= MAX_WORDS_FREQUENCIES) {
+            if (count == MAX_WORDS_FREQUENCIES) {
                 break;
             }
         }
 
-        CommentsAnalyzeSummary commentsAnalyzeSummary = new CommentsAnalyzeSummary();
-        commentsAnalyzeSummary.setVideoId(videoId);
-        commentsAnalyzeSummary.setTotalComments(totalCommentsCount);
-        commentsAnalyzeSummary.setWordsFrequency(topWordsFrequencyMap);
+//        VideoCommentsSummary videoCommentsSummary = new VideoCommentsSummary();
+//        videoCommentsSummary.setVideoId(videoId);
+//        videoCommentsSummary.setTotalComments(totalCommentsCount);
+//        videoCommentsSummary.setWordsFrequency(topWordsFrequencyMap);
+//
+//        analysisSummaryPersistence.saveAnalysisSummary(videoCommentsSummary);
 
-        analysisSummaryPersistence.saveAnalysisSummary(commentsAnalyzeSummary);
+        return topWordsFrequencyMap;
     }
 
     private ConciseComment getConciseCommentFromComment(Comment rawComment, String jobId) {

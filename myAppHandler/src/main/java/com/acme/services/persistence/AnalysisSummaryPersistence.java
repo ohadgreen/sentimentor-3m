@@ -1,10 +1,10 @@
 package com.acme.services.persistence;
 
-import com.acme.model.comment.CommentsAnalyzeSummary;
+import com.acme.model.comment.VideoCommentsSummary;
 
 public interface AnalysisSummaryPersistence {
-    void saveAnalysisSummary(CommentsAnalyzeSummary commentsAnalyzeSummary);
-    CommentsAnalyzeSummary getCommentsAnalysisSummary(String videoId);
-    void updateAnalysisSummary(String videoId, CommentsAnalyzeSummary commentsAnalyzeSummary);
+    void saveAnalysisSummary(VideoCommentsSummary videoCommentsSummary);
+    VideoCommentsSummary getCommentsAnalysisSummary(String videoId);
+    void updateAnalysisSummary(String videoId, VideoCommentsSummary videoCommentsSummary);
     void deleteAnalysisSummary(String videoId);
 }

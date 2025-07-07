@@ -8,6 +8,7 @@ spring:
 
 youtube:
   api:
+    base-url: https://youtube.googleapis.com/youtube/v3/commentThreads
     key: ${YOUTUBE_API_KEY}
 
 app:
