@@ -1,6 +1,5 @@
 package com.acme.controllers;
 
-import com.acme.model.analysisreq.VideoCommentsRequest;
 import com.acme.services.SentimentHandlingService;
 import common.model.analysisrequest.SentimentAnalysisChunkResponse;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +17,7 @@ public class SentimentAnalysisChunkController {
         this.sentimentHandlingService = sentimentHandlingService;
     }
 
-    @PostMapping("/chunkHandler")
+    @PostMapping("/handler")
     public String getRawComments(@RequestBody SentimentAnalysisChunkResponse response) {
         sentimentHandlingService.handleChunkAnalysisResponse(response);
         return "action completed";

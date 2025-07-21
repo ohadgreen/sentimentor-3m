@@ -1,6 +1,7 @@
 package com.acme.services;
 
 import com.acme.model.analysisreq.VideoCommentsRequest;
+import com.acme.model.comment.CommentDto;
 import com.acme.model.comment.VideoCommentsSummary;
 import com.acme.model.comment.ConciseComment;
 import com.acme.model.ytrawcomment.Comment;
@@ -20,6 +21,7 @@ public class RawCommentsService {
     private final AnalysisSummaryPersistence analysisSummaryPersistence;
     private final WordCountService wordCountService;
     private static final int MAX_WORDS_FREQUENCIES = 10;
+    private final static int MAX_TOP_COMMENTS = 50;
 
     public RawCommentsService(GetYouTubeRawComments getYouTubeRawComments, CommentsPersistence commentsPersistence, AnalysisSummaryPersistence analysisSummaryPersistence, WordCountService wordCountService) {
         this.getYouTubeRawComments = getYouTubeRawComments;
@@ -32,8 +34,15 @@ public class RawCommentsService {
         return commentsPersistence.getCommentsPageByVideoId(videoId, Pageable.ofSize(limit));
     }
 
-    public void getRawVideoComments(VideoCommentsRequest videoCommentsRequest) {
+    public VideoCommentsSummary getRawVideoComments(VideoCommentsRequest videoCommentsRequest) {
         String videoId = videoCommentsRequest.getVideoId();
+
+        VideoCommentsSummary commentsAnalysisSummary = analysisSummaryPersistence.getCommentsAnalysisSummary(videoId);
+        if (commentsAnalysisSummary != null) {
+            System.out.println("Comments analysis summary already exists for videoId: " + videoId);
+            return commentsAnalysisSummary;
+        }
+
         int totalCommentsCount = 0;
         String nextPageToken = null;
         
@@ -52,6 +61,7 @@ public class RawCommentsService {
 
             List<ConciseComment> conciseCommentList = comments.stream().map(rawComment -> getConciseCommentFromComment(rawComment, videoId)).toList();
 
+
             List<String> commentsForWordsCount = conciseCommentList.stream().map(ConciseComment::getTextDisplay).collect(Collectors.toList());
             wordCountService.wordsCount(wordCount, sortedWordCountsMap, commentsForWordsCount);
 
@@ -64,12 +74,28 @@ public class RawCommentsService {
 
         commentsPersistence.saveConciseComments(allConciseComments);
 
+        List<ConciseComment> topRatedComments = allConciseComments.stream()
+                .sorted(Comparator.comparingInt(ConciseComment::getLikeCount).reversed())
+                .limit(MAX_TOP_COMMENTS)
+                .collect(Collectors.toList());
+
+        List<CommentDto> topCommentsDtoList = topRatedComments.stream()
+                .map(conciseComment -> new CommentDto(
+                        conciseComment.getTextOriginal(),
+                        conciseComment.getLikeCount(),
+                        conciseComment.getAuthorDisplayName(),
+                        conciseComment.getAuthorProfileImageUrl(),
+                        conciseComment.getPublishedAt()))
+                .toList();
+
         VideoCommentsSummary videoCommentsSummary = new VideoCommentsSummary();
         videoCommentsSummary.setVideoId(videoId);
         videoCommentsSummary.setTotalComments(totalCommentsCount);
+        videoCommentsSummary.setTopRatedComments(topCommentsDtoList);
         videoCommentsSummary.setWordsFrequency(calculateTopWordsFrequencies(sortedWordCountsMap));
 
         analysisSummaryPersistence.saveAnalysisSummary(videoCommentsSummary);
+        return videoCommentsSummary;
     }
 
     protected LinkedHashMap<String, Integer> calculateTopWordsFrequencies(TreeMap<Integer, List<String>> sortedWordCountsMap) {

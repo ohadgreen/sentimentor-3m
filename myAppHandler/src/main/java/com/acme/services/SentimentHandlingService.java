@@ -21,8 +21,8 @@ import static org.slf4j.LoggerFactory.*;
 @Service
 public class SentimentHandlingService {
     private final Logger logger = getLogger(SentimentHandlingService.class);
-    private static final int DEFAULT_PAGE_SIZE = 20;
-    private static final int PARALLEL_CHUNKS_COUNT = 2;
+    private static final int DEFAULT_PAGE_SIZE = 5;
+    private static final int PARALLEL_CHUNKS_COUNT = 1;
 
     private final ConcurrentHashMap<UUID, SentimentAnalysisChunkRequest> sentimentWorkerTrackMap = new ConcurrentHashMap<>();
 
@@ -60,12 +60,13 @@ public class SentimentHandlingService {
             analysisSummaryPersistence.updateAnalysisSummary(videoId, commentsAnalysisSummary);
         }
 
-        int totalCommentsForVideo = commentsAnalysisSummary.getTotalComments();
         int totalCommentsToAnalyze = sentimentAnalysisRequest.getTotalCommentsToAnalyze();
+        int totalCommentsForVideo = commentsAnalysisSummary.getTotalComments();
 
         if (totalCommentsForVideo < totalCommentsToAnalyze) {
             sentimentAnalysisRequest.setTotalCommentsToAnalyze(totalCommentsForVideo);
         }
+        System.out.println("@@@ Total comments to analyze: " + totalCommentsForVideo);
 
         SentimentAnalysisChunkRequest analysisChunkRequest = null;
 
@@ -84,6 +85,7 @@ public class SentimentHandlingService {
                     commentsAnalysisSummary.getVideoTitle(),
                     sentimentObject,
                     sentimentAnalysisRequest.getMoreInfo(),
+                    totalCommentsToAnalyze,
                     totalCommentsForVideo,
                     analysisChunkId,
                     commentsPage,
@@ -98,6 +100,7 @@ public class SentimentHandlingService {
         if (analysisChunkRequest != null) {
             logger.info("Sentiment analysis request created for videoId: {}, analysisId: {}", videoId, analysisId);
             analysisChunkRequest.setProcessingChunkIds(processingChunkIds);
+            System.out.println("@@@ initial analysis chunks list: " + processingChunkIds);
             sentimentWorkerTrackMap.put(analysisId, analysisChunkRequest);
 
         } else {
@@ -115,8 +118,13 @@ public class SentimentHandlingService {
             return;
         }
 
-        Set<UUID> processingChunkIds = analysisChunkRequest.getProcessingChunkIds();
-        // remove the current chunk request from the processingChunkIds list
+        Set<UUID> processingChunkIds = new HashSet<>();
+        if (analysisChunkRequest.getProcessingChunkIds() != null) {
+            processingChunkIds = analysisChunkRequest.getProcessingChunkIds();
+        } else {
+            logger.warn("Processing chunk IDs are null for analysis request ID: {}", analysisChunkRequest.getAnalysisId());
+        }
+        System.out.println("@@@ existing chunk IDs: " + processingChunkIds);
         processingChunkIds.remove(chunkAnalysisResponse.getAnalysisChunkId());
 
         List<CommentSentimentResult> commentSentimentResults = convertToAnalysisResultList(chunkAnalysisResponse.getCommentSentiments(), analysisChunkRequest);
@@ -124,21 +132,25 @@ public class SentimentHandlingService {
 
         // check if required another chunk analysis
         int totalCommentsCount = analysisChunkRequest.getTotalCommentsToAnalyze();
+        int totalCommentsToAnalyze = analysisChunkRequest.getTotalCommentsToAnalyze();
         int currentProcessedCount = analysisChunkRequest.getPageNumber() * analysisChunkRequest.getPageSize() + chunkAnalysisResponse.getCommentSentiments().size();
 
-        if (currentProcessedCount < totalCommentsCount) {
+        System.out.println("@@@ totalCommentsCount: " + totalCommentsCount + " Current processed count: " + currentProcessedCount);
+        if (currentProcessedCount < totalCommentsToAnalyze) {
             // Prepare next chunk request
             int nextPageNumber = analysisChunkRequest.getPageNumber() + 1;
             List<CommentToAnalyze> nextCommentsPage = extractCommentsPage(analysisChunkRequest.getVideoId(), nextPageNumber, analysisChunkRequest.getPageSize());
 
             if (!nextCommentsPage.isEmpty()) {
                 UUID newChunkId = UUID.randomUUID();
+                System.out.println("@@@ New chunk ID: " + newChunkId);
                 SentimentAnalysisChunkRequest nextChunkRequest = new SentimentAnalysisChunkRequest(
                         analysisChunkRequest.getAnalysisId(),
                         analysisChunkRequest.getVideoId(),
                         analysisChunkRequest.getVideoTitle(),
                         analysisChunkRequest.getAnalysisObject(),
                         analysisChunkRequest.getMoreInfo(),
+                        totalCommentsToAnalyze,
                         totalCommentsCount,
                         newChunkId,
                         nextCommentsPage,
@@ -147,6 +159,7 @@ public class SentimentHandlingService {
                 );
                 callAiWorkerForChunkAnalysis(nextChunkRequest);
                 processingChunkIds.add(newChunkId);
+                nextChunkRequest.setProcessingChunkIds(processingChunkIds);
                 sentimentWorkerTrackMap.put(analysisChunkRequest.getAnalysisId(), nextChunkRequest);
 
             } else {
@@ -157,7 +170,6 @@ public class SentimentHandlingService {
         } else {
             handleCompleteAnalysis(analysisChunkRequest);
         }
-
     }
 
     private void handleCompleteAnalysis(SentimentAnalysisChunkRequest analysisChunkRequest) {
@@ -186,8 +198,7 @@ public class SentimentHandlingService {
             String response = restTemplate.postForObject(url, analysisChunkRequest, String.class);
             System.out.println("@@@ Response from AI Worker: " + response);
         } catch (Exception e) {
-            // Handle the exception (e.g., log it, retry, etc.)
-            e.printStackTrace();
+            logger.error("Error communicating with AI Worker for videoId: {} - {}", analysisChunkRequest.getVideoId(), e.getMessage());
         }
     }
 

@@ -10,10 +10,12 @@ public class SentimentAnalysisChunkRequest extends SentimentAnalysisRequest {
     private int pageNumber;
     private int pageSize;
     List<CommentToAnalyze> comments;
-
-    public SentimentAnalysisChunkRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsCount,
+    public SentimentAnalysisChunkRequest() {
+        super();
+    }
+    public SentimentAnalysisChunkRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze, int totalCommentsForVideo,
                                          UUID analysisChunkId, List<CommentToAnalyze> comments, int pageSize, int pageNumber) {
-        super(analysisId, videoId, videoTitle, analysisObject, moreInfo, totalCommentsCount);
+        super(analysisId, videoId, videoTitle, analysisObject, moreInfo, totalCommentsToAnalyze, totalCommentsForVideo);
         this.analysisChunkId = analysisChunkId;
         this.comments = comments;
         this.pageSize = pageSize;

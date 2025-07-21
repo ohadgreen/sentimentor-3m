@@ -1,23 +1,28 @@
 package common.model.analysisrequest;
 
+import java.io.Serializable;
 import java.util.UUID;
 
-public class SentimentAnalysisRequest {
+public class SentimentAnalysisRequest implements Serializable {
     private UUID analysisId;
     private String videoId;
     private String videoTitle;
     private String analysisObject;
     private String moreInfo;
     private int totalCommentsToAnalyze;
+    private int totalCommentsForVideo;
 
+    public SentimentAnalysisRequest() {
+    }
 
-    public SentimentAnalysisRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze) {
+    public SentimentAnalysisRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze, int totalCommentsForVideo) {
         this.analysisId = analysisId;
         this.videoId = videoId;
         this.videoTitle = videoTitle;
         this.analysisObject = analysisObject;
         this.moreInfo = moreInfo;
         this.totalCommentsToAnalyze = totalCommentsToAnalyze;
+        this.totalCommentsForVideo = totalCommentsForVideo;
     }
 
     public SentimentAnalysisRequest(String analysisObject, String videoTitle, String moreInfo) {
@@ -72,6 +77,12 @@ public class SentimentAnalysisRequest {
 
     public void setMoreInfo(String moreInfo) {
         this.moreInfo = moreInfo;
+    }
+    public int getTotalCommentsForVideo() {
+        return totalCommentsForVideo;
+    }
+    public void setTotalCommentsForVideo(int totalCommentsForVideo) {
+        this.totalCommentsForVideo = totalCommentsForVideo;
     }
 
 }

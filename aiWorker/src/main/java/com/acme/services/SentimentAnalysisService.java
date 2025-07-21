@@ -29,6 +29,8 @@ public class SentimentAnalysisService {
 
     @Value("classpath:templates/comments-sentiment-analysis-prompt.st")
     private Resource sentimentAnalysisPrompt;
+    @Value("${app.handler.base-url}")
+    private String appHandlerBaseUrl;
 
     public SentimentAnalysisService(ChatModel chatModel, RestTemplate restTemplate) {
         this.chatModel = chatModel;
@@ -36,9 +38,17 @@ public class SentimentAnalysisService {
     }
 
     public void communicateAnalysisResponseFromRequest(SentimentAnalysisChunkRequest analysisRequest) {
-        SentimentAnalysisChunkResponse response = analyzeCommentsChunk(analysisRequest);
-        if (response != null) {
-            // Here you would typically send the response back to the requester or store it in a database
+        SentimentAnalysisChunkResponse chunkAnalysisResponse = analyzeCommentsChunk(analysisRequest);
+        if (chunkAnalysisResponse != null) {
+
+            String url = appHandlerBaseUrl + "/sentimentChunk/handler";
+            try {
+                String appHandlerResponse = restTemplate.postForObject(url, chunkAnalysisResponse, String.class);
+                System.out.println("@@@ Response from chunk handler: " + appHandlerResponse);
+            } catch (Exception e) {
+                logger.error("Error communicating with app handler for videoId: {} - {}", analysisRequest.getVideoId(), e.getMessage());
+            }
+
             logger.info("Sentiment analysis completed for request: {}", analysisRequest.getVideoId());
         } else {
             logger.error("Failed to analyze comments for request: {}", analysisRequest.getVideoId());
@@ -53,12 +63,23 @@ public class SentimentAnalysisService {
                 .reduce((c1, c2) -> c1 + "\n" + c2)
                 .orElse("");
 
+        System.out.println("@@@ All comments: " + allComments);
+
         PromptTemplate promptTemplate = new PromptTemplate(sentimentAnalysisPrompt);
+        System.out.println("@@@ Prompt template: " + promptTemplate.getTemplate());
+
+        String analysisObject = analysisChunkRequest.getAnalysisObject() != null ?
+                analysisChunkRequest.getAnalysisObject() : "the content";
+        String moreInfo = analysisChunkRequest.getMoreInfo() != null ?
+                analysisChunkRequest.getMoreInfo() : "";
+        String videoTitle = analysisChunkRequest.getVideoTitle() != null ?
+                analysisChunkRequest.getVideoTitle() : "Unknown Video";
+
         Prompt prompt = promptTemplate.create(Map.of(
-                "object", analysisChunkRequest.getAnalysisObject(),
+                "object", analysisObject,
                 "commentsNumber", analysisChunkRequest.getComments().size(),
-                "moreInfo", analysisChunkRequest.getMoreInfo(),
-                "videoTitle", analysisChunkRequest.getVideoTitle(),
+                "moreInfo", moreInfo,
+                "videoTitle", videoTitle,
                 "comments", allComments)
         );
 

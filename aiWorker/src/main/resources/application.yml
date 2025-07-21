@@ -15,4 +15,4 @@ consumer:
 
 app:
   handler:
-    path: ${APP_HANDLER_PATH}
+    base-url: ${APP_HANDLER_PATH:http://localhost:8081/api}
