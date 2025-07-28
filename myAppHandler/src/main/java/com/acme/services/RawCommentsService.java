@@ -34,6 +34,11 @@ public class RawCommentsService {
         return commentsPersistence.getCommentsPageByVideoId(videoId, Pageable.ofSize(limit));
     }
 
+    public List<ConciseComment> getConciseCommentPage(String videoId, int pageNumber, int pageSize) {
+        Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
+        return commentsPersistence.getCommentsPageByVideoId(videoId, pageable);
+    }
+
     public VideoCommentsSummary getRawVideoComments(VideoCommentsRequest videoCommentsRequest) {
         String videoId = videoCommentsRequest.getVideoId();
 
@@ -60,7 +65,6 @@ public class RawCommentsService {
             }
 
             List<ConciseComment> conciseCommentList = comments.stream().map(rawComment -> getConciseCommentFromComment(rawComment, videoId)).toList();
-
 
             List<String> commentsForWordsCount = conciseCommentList.stream().map(ConciseComment::getTextDisplay).collect(Collectors.toList());
             wordCountService.wordsCount(wordCount, sortedWordCountsMap, commentsForWordsCount);

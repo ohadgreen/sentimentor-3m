@@ -57,4 +57,9 @@ public class SentimentAnalysisController {
         return rawCommentsService.getConciseCommentList(videoId, commentsNum);
     }
 
+    @GetMapping("/commentsPage/{videoId}/{pageNum}/{pageSize}")
+    public List<ConciseComment> getConciseCommentsPage(@PathVariable String videoId, @PathVariable Integer pageNum, @PathVariable Integer pageSize) {
+        return rawCommentsService.getConciseCommentPage(videoId, pageNum, pageSize);
+    }
+
 }
