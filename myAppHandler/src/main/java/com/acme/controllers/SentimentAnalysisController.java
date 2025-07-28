@@ -6,10 +6,7 @@ import com.acme.model.comment.ConciseComment;
 import com.acme.services.AnalysisSummaryService;
 import com.acme.services.RawCommentsService;
 import com.acme.services.SentimentHandlingService;
-import common.model.analysisrequest.SentimentAnalysisChunkResponse;
 import common.model.analysisrequest.SentimentAnalysisRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,8 +15,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/sentiment")
 public class SentimentAnalysisController {
-
-    private final Logger logger = LoggerFactory.getLogger(SentimentAnalysisController.class);
 
     private final RawCommentsService rawCommentsService;
     private final AnalysisSummaryService analysisSummaryService;
