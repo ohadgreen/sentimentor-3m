@@ -1,21 +1,20 @@
 package common.model.analysisrequest;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class SentimentAnalysisChunkRequest extends SentimentAnalysisRequest {
     private UUID analysisChunkId;
-    private Set<UUID> processingChunkIds;
+//    private Set<UUID> processingChunkIds;
     private int pageNumber;
     private int pageSize;
     List<CommentToAnalyze> comments;
     public SentimentAnalysisChunkRequest() {
         super();
     }
-    public SentimentAnalysisChunkRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze, int totalCommentsForVideo,
+    public SentimentAnalysisChunkRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze,
                                          UUID analysisChunkId, List<CommentToAnalyze> comments, int pageSize, int pageNumber) {
-        super(analysisId, videoId, videoTitle, analysisObject, moreInfo, totalCommentsToAnalyze, totalCommentsForVideo);
+        super(analysisId, videoId, videoTitle, analysisObject, moreInfo, totalCommentsToAnalyze);
         this.analysisChunkId = analysisChunkId;
         this.comments = comments;
         this.pageSize = pageSize;
@@ -37,13 +36,13 @@ public class SentimentAnalysisChunkRequest extends SentimentAnalysisRequest {
         this.analysisChunkId = analysisChunkId;
     }
 
-    public Set<UUID> getProcessingChunkIds() {
-        return processingChunkIds;
-    }
-
-    public void setProcessingChunkIds(Set<UUID> processingChunkIds) {
-        this.processingChunkIds = processingChunkIds;
-    }
+//    public Set<UUID> getProcessingChunkIds() {
+//        return processingChunkIds;
+//    }
+//
+//    public void setProcessingChunkIds(Set<UUID> processingChunkIds) {
+//        this.processingChunkIds = processingChunkIds;
+//    }
 
     public List<CommentToAnalyze> getComments() {
         return comments;

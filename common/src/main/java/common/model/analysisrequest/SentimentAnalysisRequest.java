@@ -15,14 +15,13 @@ public class SentimentAnalysisRequest implements Serializable {
     public SentimentAnalysisRequest() {
     }
 
-    public SentimentAnalysisRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze, int totalCommentsForVideo) {
+    public SentimentAnalysisRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze) {
         this.analysisId = analysisId;
         this.videoId = videoId;
         this.videoTitle = videoTitle;
         this.analysisObject = analysisObject;
         this.moreInfo = moreInfo;
         this.totalCommentsToAnalyze = totalCommentsToAnalyze;
-        this.totalCommentsForVideo = totalCommentsForVideo;
     }
 
     public SentimentAnalysisRequest(String analysisObject, String videoTitle, String moreInfo) {
@@ -77,12 +76,6 @@ public class SentimentAnalysisRequest implements Serializable {
 
     public void setMoreInfo(String moreInfo) {
         this.moreInfo = moreInfo;
-    }
-    public int getTotalCommentsForVideo() {
-        return totalCommentsForVideo;
-    }
-    public void setTotalCommentsForVideo(int totalCommentsForVideo) {
-        this.totalCommentsForVideo = totalCommentsForVideo;
     }
 
 }

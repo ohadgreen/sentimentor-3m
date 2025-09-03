@@ -1,6 +1,7 @@
 package com.acme.controllers;
 
 import com.acme.model.analysisreq.VideoCommentsRequest;
+import com.acme.model.comment.CommentSentimentSummary;
 import com.acme.model.comment.VideoCommentsSummary;
 import com.acme.model.comment.ConciseComment;
 import com.acme.services.AnalysisSummaryService;
@@ -29,6 +30,10 @@ public class SentimentAnalysisController {
     @GetMapping("/comments/{videoId}")
     public VideoCommentsSummary getCommentsAnalysisSummary(@PathVariable String videoId) {
         return analysisSummaryService.getCommentsAnalysisSummary(videoId);
+    }
+    @GetMapping("/sentSummary/{videoId}/{analysisId}")
+    public CommentSentimentSummary getCommentsSentimentSummary(@PathVariable String videoId, @PathVariable UUID analysisId) {
+        return sentimentHandlingService.getCommentSentimentSummary(videoId, analysisId);
     }
 
     @PostMapping("/analyzeRequest")

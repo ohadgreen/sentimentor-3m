@@ -22,7 +22,6 @@ public class AnalysisSummaryPersistInMongo implements AnalysisSummaryPersistence
         if (existingSummary != null) {
             existingSummary.setWordsFrequency(videoCommentsSummary.getWordsFrequency());
             existingSummary.setTopRatedComments(videoCommentsSummary.getTopRatedComments());
-            existingSummary.setCompleted(videoCommentsSummary.isCompleted());
             analysisSummaryRepository.save(existingSummary);
         } else {
             analysisSummaryRepository.save(videoCommentsSummary);

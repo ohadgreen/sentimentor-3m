@@ -4,10 +4,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Document(collection = "video_comments_summary")
 public class VideoCommentsSummary implements Serializable {
@@ -16,19 +13,18 @@ public class VideoCommentsSummary implements Serializable {
     private String videoTitle;
     private String jobId;
     private int totalComments;
-    private boolean isCompleted;
     private LinkedHashMap<String, Integer> wordsFrequency;
     private List<CommentDto> topRatedComments;
     private Map<String, Boolean> sentimentAnalysisStatus = new HashMap<>();
+    private Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap = new HashMap<>();
 
     public VideoCommentsSummary() {
     }
 
-    public VideoCommentsSummary(String jobId, String videoId, String videoTitle, boolean isCompleted, int totalComments, LinkedHashMap<String, Integer> wordsFrequency, List<CommentDto> topRatedComments) {
+    public VideoCommentsSummary(String jobId, String videoId, String videoTitle, int totalComments, LinkedHashMap<String, Integer> wordsFrequency, List<CommentDto> topRatedComments) {
         this.jobId = jobId;
         this.videoId = videoId;
         this.videoTitle = videoTitle;
-        this.isCompleted = isCompleted;
         this.totalComments = totalComments;
         this.wordsFrequency = wordsFrequency;
         this.topRatedComments = topRatedComments;
@@ -80,18 +76,18 @@ public class VideoCommentsSummary implements Serializable {
         this.topRatedComments = topRatedComments;
     }
 
-    public boolean isCompleted() {
-        return isCompleted;
-    }
 
-    public void setCompleted(boolean completed) {
-        isCompleted = completed;
-    }
+//    public Map<String, Boolean> getSentimentAnalysisStatus() {
+//        return sentimentAnalysisStatus;
+//    }
+//    public void setSentimentAnalysisStatus(Map<String, Boolean> sentimentAnalysisStatus) {
+//        this.sentimentAnalysisStatus = sentimentAnalysisStatus;
+//    }
 
-    public Map<String, Boolean> getSentimentAnalysisStatus() {
-        return sentimentAnalysisStatus;
+    public Map<UUID, CommentSentimentSummary> getSentimentAnalysisStatusMap() {
+        return sentimentAnalysisStatusMap;
     }
-    public void setSentimentAnalysisStatus(Map<String, Boolean> sentimentAnalysisStatus) {
-        this.sentimentAnalysisStatus = sentimentAnalysisStatus;
+    public void setSentimentAnalysisStatusMap(Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap) {
+        this.sentimentAnalysisStatusMap = sentimentAnalysisStatusMap;
     }
 }
