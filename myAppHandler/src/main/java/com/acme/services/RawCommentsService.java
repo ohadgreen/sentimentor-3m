@@ -57,7 +57,7 @@ public class RawCommentsService {
         TreeMap<Integer, List<String>> sortedWordCountsMap = new TreeMap<>(Collections.reverseOrder());
 
         do {
-            CommentThread rawCommentsFromYouTube = getYouTubeRawComments.getRawCommentsFromYouTube(videoId, videoCommentsRequest.getCommentsInPage(), nextPageToken);
+            CommentThread rawCommentsFromYouTube = getYouTubeRawComments.getRawCommentsFromYouTube(videoId, nextPageToken);
             List<Comment> comments = rawCommentsFromYouTube.getComments();
 
             if (comments == null || comments.isEmpty()) {

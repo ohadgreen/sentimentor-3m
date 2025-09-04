@@ -15,7 +15,6 @@ public class VideoCommentsSummary implements Serializable {
     private int totalComments;
     private LinkedHashMap<String, Integer> wordsFrequency;
     private List<CommentDto> topRatedComments;
-    private Map<String, Boolean> sentimentAnalysisStatus = new HashMap<>();
     private Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap = new HashMap<>();
 
     public VideoCommentsSummary() {
@@ -75,14 +74,6 @@ public class VideoCommentsSummary implements Serializable {
     public void setTopRatedComments(List<CommentDto> topRatedComments) {
         this.topRatedComments = topRatedComments;
     }
-
-
-//    public Map<String, Boolean> getSentimentAnalysisStatus() {
-//        return sentimentAnalysisStatus;
-//    }
-//    public void setSentimentAnalysisStatus(Map<String, Boolean> sentimentAnalysisStatus) {
-//        this.sentimentAnalysisStatus = sentimentAnalysisStatus;
-//    }
 
     public Map<UUID, CommentSentimentSummary> getSentimentAnalysisStatusMap() {
         return sentimentAnalysisStatusMap;

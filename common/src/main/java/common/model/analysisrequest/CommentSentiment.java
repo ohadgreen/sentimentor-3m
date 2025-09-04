@@ -1,10 +1,11 @@
 package common.model.analysisrequest;
 
+import java.time.LocalDateTime;
+
 public class CommentSentiment {
     private String commentId;
     private Sentiment sentiment;
     private String sentimentReason;
-
     public CommentSentiment() {
     }
 

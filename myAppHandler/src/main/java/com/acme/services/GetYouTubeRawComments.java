@@ -24,13 +24,12 @@ public class GetYouTubeRawComments {
     private String API_KEY;
     @Value("${youtube.api.base-url}")
     private String COMMENT_THREADS_BASE_API;
-    private static final int MAX_RESULTS = 50;
+    private static final int COMMENTS_PER_PAGE = 50;
 
-    public CommentThread getRawCommentsFromYouTube(String videoId, Integer commentsInPage, @Nullable String nextPageToken) {
+    public CommentThread getRawCommentsFromYouTube(String videoId, @Nullable String nextPageToken) {
         logger.info("get raw comments videoId: {}, nextPageToken: {}", videoId, nextPageToken);
 
-        int commentsLimit = commentsInPage == null ? MAX_RESULTS : commentsInPage;
-        String commentThreadsUri = COMMENT_THREADS_BASE_API + "?part=snippet&videoId="+ videoId + "&key=" + API_KEY + "&maxResults=" + commentsLimit;
+        String commentThreadsUri = COMMENT_THREADS_BASE_API + "?part=snippet&videoId="+ videoId + "&key=" + API_KEY + "&maxResults=" + COMMENTS_PER_PAGE;
         if (nextPageToken != null) {
             commentThreadsUri += "&pageToken=" + nextPageToken;
         }

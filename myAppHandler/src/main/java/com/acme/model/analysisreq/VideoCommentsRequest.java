@@ -5,7 +5,6 @@ public class VideoCommentsRequest {
     private String jobId;
     private String videoId;
     private int totalCommentsRequired;
-    private int commentsInPage;
 
     public String getUserId() {
         return userId;
@@ -37,13 +36,5 @@ public class VideoCommentsRequest {
 
     public void setTotalCommentsRequired(int totalCommentsRequired) {
         this.totalCommentsRequired = totalCommentsRequired;
-    }
-
-    public int getCommentsInPage() {
-        return commentsInPage;
-    }
-
-    public void setCommentsInPage(int commentsInPage) {
-        this.commentsInPage = commentsInPage;
     }
 }

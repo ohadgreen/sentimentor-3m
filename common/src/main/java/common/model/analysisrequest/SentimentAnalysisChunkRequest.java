@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public class SentimentAnalysisChunkRequest extends SentimentAnalysisRequest {
     private UUID analysisChunkId;
-//    private Set<UUID> processingChunkIds;
     private int pageNumber;
     private int pageSize;
     List<CommentToAnalyze> comments;
@@ -35,14 +34,6 @@ public class SentimentAnalysisChunkRequest extends SentimentAnalysisRequest {
     public void setAnalysisChunkId(UUID analysisChunkId) {
         this.analysisChunkId = analysisChunkId;
     }
-
-//    public Set<UUID> getProcessingChunkIds() {
-//        return processingChunkIds;
-//    }
-//
-//    public void setProcessingChunkIds(Set<UUID> processingChunkIds) {
-//        this.processingChunkIds = processingChunkIds;
-//    }
 
     public List<CommentToAnalyze> getComments() {
         return comments;

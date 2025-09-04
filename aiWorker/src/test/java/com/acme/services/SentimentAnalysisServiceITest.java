@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,13 +29,16 @@ class SentimentAnalysisServiceITest {
         SentimentAnalysisChunkResponse response = sentimentAnalysisService.analyzeCommentsChunk(sentimentReqTest);
 
         assertNotNull(response, "Response should not be null");
-//        assertNotNull(response.getSentimentAnalysisId(), "Response ID should be generated");
         assertFalse(response.getCommentSentiments().isEmpty(), "Sentiments list should not be empty");
 
-        for (CommentSentiment commentSentiment : response.getCommentSentiments()) {
-            System.out.println("Comment ID: " + commentSentiment.getCommentId() + " - sentiment: " + commentSentiment.getSentiment() + " - reason: " + commentSentiment.getSentimentReason());
-            if (commentSentiment.getCommentId().equals("c2")) {
-                assertEquals(Sentiment.POSITIVE, commentSentiment.getSentiment(), "Comment c2 should be positive");
+        for (CommentToAnalyze commentToAnalyze : response.getCommentSentiments()) {
+            System.out.println("Comment ID: " + commentToAnalyze.getCommentId() +
+                    " - sentiment: " + commentToAnalyze.getSentiment() +
+                    " - reason: " + commentToAnalyze.getSentimentReason() +
+                    " - likes: " + commentToAnalyze.getLikeCount()
+            );
+            if (commentToAnalyze.getCommentId().equals("c2")) {
+                assertEquals(Sentiment.POSITIVE, commentToAnalyze.getSentiment(), "Comment c2 should be positive");
             }
         }
     }
@@ -51,11 +55,11 @@ class SentimentAnalysisServiceITest {
                 analysisObject,
                 "Google AI DEMOLISHES OpenAI! The Ultimate AI Showdown is OVER?",
                 "Google's new video generation model is called Veo 2. SORA is a video generation model created by OpenAI",
-                Arrays.asList(new CommentToAnalyze("c1", c1),
-                        new CommentToAnalyze("c2", c2),
-                        new CommentToAnalyze("c3", c3),
-                        new CommentToAnalyze("c4", c4),
-                        new CommentToAnalyze("c5", c5)),
+                Arrays.asList(new CommentToAnalyze("c1", c1, 10, null),
+                        new CommentToAnalyze("c2", c2, 9, LocalDateTime.parse("2025-01-01T00:00:00")),
+                        new CommentToAnalyze("c3", c3, 9, LocalDateTime.parse("2025-01-02T00:00:00")),
+                        new CommentToAnalyze("c4", c4, 7, null),
+                        new CommentToAnalyze("c5", c5, 1, null)),
                 0, 0
         );
 

@@ -35,7 +35,13 @@ public class AnalysisSummaryPersistInMongo implements AnalysisSummaryPersistence
 
     @Override
     public void updateAnalysisSummary(String videoId, VideoCommentsSummary videoCommentsSummary) {
-
+        VideoCommentsSummary existingSummary = analysisSummaryRepository.findByVideoId(videoId);
+        if (existingSummary != null) {
+            existingSummary.setSentimentAnalysisStatusMap(videoCommentsSummary.getSentimentAnalysisStatusMap());
+            analysisSummaryRepository.save(existingSummary);
+        } else {
+            analysisSummaryRepository.save(videoCommentsSummary);
+        }
     }
 
     @Override

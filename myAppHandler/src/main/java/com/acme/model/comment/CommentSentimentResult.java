@@ -4,7 +4,10 @@ import common.model.analysisrequest.Sentiment;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDateTime;
 
 @Document(collection = "comment_sentiments")
 @CompoundIndexes( {
@@ -15,13 +18,19 @@ public class CommentSentimentResult {
     private String id;
     private String commentId;
     private String videoId;
+    @Indexed
+    private Integer likeCount;
+    @Indexed
+    private LocalDateTime publishedAt;
     private String sentimentObject;
     private Sentiment sentiment;
     private String sentimentReason;
 
-    public CommentSentimentResult(String commentId, String videoId, String sentimentObject, Sentiment sentiment, String sentimentReason) {
+    public CommentSentimentResult(String commentId, String videoId, Integer likeCount, LocalDateTime publishedAt, String sentimentObject, Sentiment sentiment, String sentimentReason) {
         this.commentId = commentId;
         this.videoId = videoId;
+        this.likeCount = likeCount;
+        this.publishedAt = publishedAt;
         this.sentimentObject = sentimentObject;
         this.sentiment = sentiment;
         this.sentimentReason = sentimentReason;
@@ -52,6 +61,22 @@ public class CommentSentimentResult {
 
     public void setVideoId(String videoId) {
         this.videoId = videoId;
+    }
+
+    public Integer getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(Integer likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public LocalDateTime getPublishedAt() {
+        return publishedAt;
+    }
+
+    public void setPublishedAt(LocalDateTime publishedAt) {
+        this.publishedAt = publishedAt;
     }
 
     public String getSentimentObject() {
