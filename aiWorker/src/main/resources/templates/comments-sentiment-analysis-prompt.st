@@ -1,4 +1,5 @@
 your task is to analyze the sentiment towards {object} in the list of comments below, each with its comment id and text.
+if the comment does not express a clear sentiment towards {object}, classify it as UNKNOWN.
 These comments are regarding a Youtube video titled {videoTitle}
 more information: {moreInfo}
 Your response should be in JSON format with the following schema:
