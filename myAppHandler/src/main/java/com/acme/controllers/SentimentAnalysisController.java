@@ -8,6 +8,7 @@ import com.acme.services.AnalysisSummaryService;
 import com.acme.services.RawCommentsService;
 import com.acme.services.SentimentHandlingService;
 import common.model.analysisrequest.SentimentAnalysisRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,25 +42,9 @@ public class SentimentAnalysisController {
         return sentimentHandlingService.handleVideoSentimentAnalysisReq(sentimentAnalysisRequest);
     }
 
-    @PostMapping("/videocomments")
-    public String getRawComments(@RequestBody VideoCommentsRequest videoCommentsRequest) {
-        rawCommentsService.getRawVideoComments(videoCommentsRequest);
-        return "action completed";
-    }
-
-    @PostMapping("/commentsList")
-    public VideoCommentsSummary videoCommentsListRequest(@RequestBody VideoCommentsRequest videoCommentsRequest) {
+    @PostMapping("/getRawVideoComments")
+    public VideoCommentsSummary getRawVideoComments(@RequestBody VideoCommentsRequest videoCommentsRequest) {
         return rawCommentsService.getRawVideoComments(videoCommentsRequest);
-    }
-
-    @GetMapping("/comments/{videoId}/{commentsNum}")
-    public List<ConciseComment> getConciseComments(@PathVariable String videoId, @PathVariable Integer commentsNum) {
-        return rawCommentsService.getConciseCommentList(videoId, commentsNum);
-    }
-
-    @GetMapping("/commentsPage/{videoId}/{pageNum}/{pageSize}")
-    public List<ConciseComment> getConciseCommentsPage(@PathVariable String videoId, @PathVariable Integer pageNum, @PathVariable Integer pageSize) {
-        return rawCommentsService.getConciseCommentPage(videoId, pageNum, pageSize);
     }
 
 }

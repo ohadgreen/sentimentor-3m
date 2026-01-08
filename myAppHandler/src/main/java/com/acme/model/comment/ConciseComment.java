@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Document(collection = "concise_comments")
 public class ConciseComment {
@@ -23,7 +24,7 @@ public class ConciseComment {
     private boolean canRate;
     @Indexed
     private Integer likeCount;
-    private List<String> words;
+    private Set<String> words;
     private String viewerRating;
     @Indexed
     private LocalDateTime publishedAt;
@@ -117,11 +118,11 @@ public class ConciseComment {
         this.likeCount = likeCount;
     }
 
-    public List<String> getWords() {
+    public Set<String> getWords() {
         return words;
     }
 
-    public void setWords(List<String> words) {
+    public void setWords(Set<String> words) {
         this.words = words;
     }
 

@@ -22,7 +22,7 @@ public class CommentsPersistInMongo implements CommentsPersistence {
     }
 
     @Override
-    public List<ConciseComment> getCommentsPageByVideoId(String videoId, Pageable pageable) {
+    public Page<ConciseComment> getCommentsPageByVideoId(String videoId, Pageable pageable) {
         Sort defaultSort = Sort.by(
                 Sort.Order.desc("likeCount"),
                 Sort.Order.desc("publishedAt")
@@ -36,6 +36,12 @@ public class CommentsPersistInMongo implements CommentsPersistence {
 
         return conciseCommentRepository.findConciseCommentByVideoId(videoId, sortedPageable);
     }
+
+    @Override
+    public List<ConciseComment> findByVideoIdAndCommentIdIn(String videoId, List<String> commentIds) {
+        return List.of();
+    }
+
 
     @Override
     public void removeCommentsByVideoId(String videoId) {

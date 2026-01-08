@@ -21,7 +21,6 @@ public class AnalysisSummaryPersistInMongo implements AnalysisSummaryPersistence
         VideoCommentsSummary existingSummary = analysisSummaryRepository.findByVideoId(videoCommentsSummary.getVideoId());
         if (existingSummary != null) {
             existingSummary.setWordsFrequency(videoCommentsSummary.getWordsFrequency());
-            existingSummary.setTopRatedComments(videoCommentsSummary.getTopRatedComments());
             analysisSummaryRepository.save(existingSummary);
         } else {
             analysisSummaryRepository.save(videoCommentsSummary);

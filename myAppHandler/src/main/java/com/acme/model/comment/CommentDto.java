@@ -1,5 +1,7 @@
 package com.acme.model.comment;
 
+import common.model.analysisrequest.Sentiment;
+
 import java.time.LocalDateTime;
 
 public class CommentDto {
@@ -8,6 +10,9 @@ public class CommentDto {
     private String authorName;
     private String authorProfileImageUrl;
     private LocalDateTime publishedAt;
+    private String sentimentObject;
+    private Sentiment sentiment;
+    private String sentimentReason;
 
     public CommentDto(String text, Integer likeCount, String authorName, String authorProfileImageUrl, LocalDateTime publishedAt) {
         this.text = text;
@@ -55,5 +60,29 @@ public class CommentDto {
 
     public void setPublishedAt(LocalDateTime publishedAt) {
         this.publishedAt = publishedAt;
+    }
+
+    public String getSentimentObject() {
+        return sentimentObject;
+    }
+
+    public void setSentimentObject(String sentimentObject) {
+        this.sentimentObject = sentimentObject;
+    }
+
+    public Sentiment getSentiment() {
+        return sentiment;
+    }
+
+    public void setSentiment(Sentiment sentiment) {
+        this.sentiment = sentiment;
+    }
+
+    public String getSentimentReason() {
+        return sentimentReason;
+    }
+
+    public void setSentimentReason(String sentimentReason) {
+        this.sentimentReason = sentimentReason;
     }
 }

@@ -4,6 +4,7 @@ import com.acme.model.comment.ConciseComment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -31,11 +32,11 @@ public class CommentsPersistInMemory implements CommentsPersistence {
     }
 
     @Override
-    public List<ConciseComment> getCommentsPageByVideoId(String videoId, Pageable pageable) {
+    public Page<ConciseComment> getCommentsPageByVideoId(String videoId, Pageable pageable) {
         List<ConciseComment> conciseCommentList = conciseCommentsMap.get(videoId);
 
         if (conciseCommentList == null || conciseCommentList.isEmpty()) {
-            return Collections.emptyList();
+            return Page.empty();
         }
         int pageSize = pageable.getPageSize();
         int limit = pageSize;
@@ -53,12 +54,19 @@ public class CommentsPersistInMemory implements CommentsPersistence {
         int start = pageNumber * pageSize;
         int end = Math.min(start + limit, conciseCommentList.size());
         if (start >= conciseCommentList.size()) {
-            return Collections.emptyList();
+            return Page.empty();
         }
-        List<ConciseComment> sortedComments = conciseCommentList.subList(start, end);
-        logger.info("retrieved {} comments for videoId {}", sortedComments.size(), videoId);
-        return sortedComments;
+
+        List<ConciseComment> pageContent = conciseCommentList.subList(start, end);
+        return new org.springframework.data.domain.PageImpl<>(pageContent, pageable, conciseCommentList.size());
+
     }
+
+    @Override
+    public List<ConciseComment> findByVideoIdAndCommentIdIn(String videoId, List<String> commentIds) {
+        return List.of();
+    }
+
 
     @Override
     public void removeCommentsByVideoId(String videoId) {

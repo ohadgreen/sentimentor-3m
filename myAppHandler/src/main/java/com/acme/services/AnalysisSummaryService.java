@@ -22,14 +22,7 @@ public class AnalysisSummaryService {
     }
 
     public VideoCommentsSummary getCommentsAnalysisSummary(String videoId) {
-        VideoCommentsSummary commentsAnalysisSummary = analysisSummaryPersistence.getCommentsAnalysisSummary(videoId);
-
-        List<ConciseComment> topComments = commentsPersistence.getCommentsPageByVideoId(videoId, Pageable.ofSize(MAX_TOP_COMMENTS));
-        List<CommentDto> topCommentsDtoList = topComments.stream().map(this::convertConciseCommentToCommentDto).toList();
-
-        commentsAnalysisSummary.setTopRatedComments(topCommentsDtoList);
-
-        return commentsAnalysisSummary;
+        return analysisSummaryPersistence.getCommentsAnalysisSummary(videoId);
     }
 
     private CommentDto convertConciseCommentToCommentDto(ConciseComment conciseComment) {

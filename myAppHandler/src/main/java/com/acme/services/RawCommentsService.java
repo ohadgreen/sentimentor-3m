@@ -8,6 +8,7 @@ import com.acme.model.ytrawcomment.Comment;
 import com.acme.model.ytrawcomment.CommentThread;
 import com.acme.services.persistence.AnalysisSummaryPersistence;
 import com.acme.services.persistence.CommentsPersistence;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,8 @@ public class RawCommentsService {
     private final WordCountService wordCountService;
     private static final int MAX_WORDS_FREQUENCIES = 10;
     private final static int MAX_TOP_COMMENTS = 50;
+    private final static int MAX_WORDS_IN_COMMENT = 50;
+
 
     public RawCommentsService(GetYouTubeRawComments getYouTubeRawComments, CommentsPersistence commentsPersistence, AnalysisSummaryPersistence analysisSummaryPersistence, WordCountService wordCountService) {
         this.getYouTubeRawComments = getYouTubeRawComments;
@@ -30,11 +33,11 @@ public class RawCommentsService {
         this.wordCountService = wordCountService;
     }
 
-    public List<ConciseComment> getConciseCommentList(String videoId, int limit) {
+    public Page<ConciseComment> getConciseCommentList(String videoId, int limit) {
         return commentsPersistence.getCommentsPageByVideoId(videoId, Pageable.ofSize(limit));
     }
 
-    public List<ConciseComment> getConciseCommentPage(String videoId, int pageNumber, int pageSize) {
+    public Page<ConciseComment> getConciseCommentPage(String videoId, int pageNumber, int pageSize) {
         Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
         return commentsPersistence.getCommentsPageByVideoId(videoId, pageable);
     }
@@ -81,7 +84,7 @@ public class RawCommentsService {
         List<ConciseComment> topRatedComments = allConciseComments.stream()
                 .sorted(Comparator.comparingInt(ConciseComment::getLikeCount).reversed())
                 .limit(MAX_TOP_COMMENTS)
-                .collect(Collectors.toList());
+                .toList();
 
         List<CommentDto> topCommentsDtoList = topRatedComments.stream()
                 .map(conciseComment -> new CommentDto(
@@ -95,7 +98,6 @@ public class RawCommentsService {
         VideoCommentsSummary videoCommentsSummary = new VideoCommentsSummary();
         videoCommentsSummary.setVideoId(videoId);
         videoCommentsSummary.setTotalComments(totalCommentsCount);
-        videoCommentsSummary.setTopRatedComments(topCommentsDtoList);
         videoCommentsSummary.setWordsFrequency(calculateTopWordsFrequencies(sortedWordCountsMap));
 
         analysisSummaryPersistence.saveAnalysisSummary(videoCommentsSummary);
@@ -117,14 +119,6 @@ public class RawCommentsService {
                 break;
             }
         }
-
-//        VideoCommentsSummary videoCommentsSummary = new VideoCommentsSummary();
-//        videoCommentsSummary.setVideoId(videoId);
-//        videoCommentsSummary.setTotalComments(totalCommentsCount);
-//        videoCommentsSummary.setWordsFrequency(topWordsFrequencyMap);
-//
-//        analysisSummaryPersistence.saveAnalysisSummary(videoCommentsSummary);
-
         return topWordsFrequencyMap;
     }
 
@@ -144,10 +138,22 @@ public class RawCommentsService {
         conciseComment.setAuthorProfileImageUrl(rawComment.getOuterSnippet().getTopLevelComment().getInnerSnippet().getAuthorProfileImageUrl());
         conciseComment.setCanRate(rawComment.getOuterSnippet().getTopLevelComment().getInnerSnippet().isCanRate());
         conciseComment.setLikeCount(rawComment.getOuterSnippet().getTopLevelComment().getInnerSnippet().getLikeCount());
+        conciseComment.setWords(splitCommentTextIntoWords(rawComment.getOuterSnippet().getTopLevelComment().getInnerSnippet().getTextOriginal()));
         conciseComment.setViewerRating(rawComment.getOuterSnippet().getTopLevelComment().getInnerSnippet().getViewerRating());
         conciseComment.setPublishedAt(rawComment.getOuterSnippet().getTopLevelComment().getInnerSnippet().getPublishedAt());
         conciseComment.setUpdatedAt(rawComment.getOuterSnippet().getTopLevelComment().getInnerSnippet().getUpdatedAt());
 
         return conciseComment;
+    }
+
+    private Set<String> splitCommentTextIntoWords(String commentText) {
+        if (commentText == null || commentText.isEmpty()) {
+            return Collections.emptySet();
+        }
+        String[] wordsArray = commentText.toLowerCase().split("\\W+");
+        return Arrays.stream(wordsArray)
+                .filter(word -> !word.isEmpty())
+                .limit(MAX_WORDS_IN_COMMENT)
+                .collect(Collectors.toSet());
     }
 }
