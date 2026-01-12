@@ -134,7 +134,6 @@ public class CommentSentimentSummary {
     public int getNeutralComments() {
         return neutralComments;
     }
-
     public void setNeutralComments(int neutralComments) {
         this.neutralComments = neutralComments;
     }
