@@ -32,9 +32,11 @@ public class SentimentAnalysisController {
     public VideoCommentsSummary getCommentsAnalysisSummary(@PathVariable String videoId) {
         return analysisSummaryService.getCommentsAnalysisSummary(videoId);
     }
-    @GetMapping("/sentSummary/{videoId}/{analysisId}")
-    public CommentSentimentSummary getCommentsSentimentSummary(@PathVariable String videoId, @PathVariable UUID analysisId) {
-        return sentimentHandlingService.getCommentSentimentSummary(videoId, analysisId);
+    @GetMapping("/sentimentOngoingAnalysis/{videoId}/{analysisId}")
+    public CommentSentimentSummary getOnGoingSentimentAnalysisSummary(
+            @PathVariable String videoId,
+            @PathVariable UUID analysisId)  {
+        return sentimentHandlingService.getOngoingSentimentAnalysis(videoId, analysisId);
     }
 
     @PostMapping("/analyzeRequest")

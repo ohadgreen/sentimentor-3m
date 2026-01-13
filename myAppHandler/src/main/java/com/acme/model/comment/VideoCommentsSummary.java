@@ -14,7 +14,6 @@ public class VideoCommentsSummary implements Serializable {
     private String jobId;
     private int totalComments;
     private LinkedHashMap<String, Integer> wordsFrequency;
-//    private List<CommentDto> topRatedComments;
     private Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap = new HashMap<>();
 
     public VideoCommentsSummary() {

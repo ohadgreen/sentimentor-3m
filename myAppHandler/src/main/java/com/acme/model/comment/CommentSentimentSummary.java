@@ -27,6 +27,12 @@ public class CommentSentimentSummary {
         this.moreInfo = moreInfo;
     }
 
+    public CommentSentimentSummary(String videoId, UUID analysisId, AnalysisStatus analysisStatus) {
+        this.videoId = videoId;
+        this.analysisId = analysisId;
+        this.analysisStatus = analysisStatus;
+    }
+
     public CommentSentimentSummary() {
     }
 
