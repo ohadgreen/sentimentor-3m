@@ -1,13 +1,17 @@
 package com.acme.model.comment;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Document(collection = "video_comments_summary")
-public class VideoCommentsSummary implements Serializable {
+public class VideoCommentsSummary implements Serializable, Persistable<String> {
     @Id
     private String videoId;
     private String videoTitle;
@@ -15,6 +19,10 @@ public class VideoCommentsSummary implements Serializable {
     private int totalComments;
     private LinkedHashMap<String, Integer> wordsFrequency;
     private Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap = new HashMap<>();
+    @CreatedDate
+    private LocalDateTime createDate;
+    @LastModifiedDate
+    private LocalDateTime updateDate;
 
     public VideoCommentsSummary() {
     }
@@ -70,5 +78,31 @@ public class VideoCommentsSummary implements Serializable {
     }
     public void setSentimentAnalysisStatusMap(Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap) {
         this.sentimentAnalysisStatusMap = sentimentAnalysisStatusMap;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    @Override
+    public String getId() {
+        return videoId;
+    }
+
+    @Override
+    public boolean isNew() {
+        return createDate == null;
     }
 }

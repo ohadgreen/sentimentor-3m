@@ -4,6 +4,7 @@ import com.acme.model.comment.CommentSentimentResult;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface CommentSentimentRepository extends MongoRepository<CommentSentimentResult, String>  {
@@ -12,4 +13,5 @@ public interface CommentSentimentRepository extends MongoRepository<CommentSenti
 //    List<CommentSentimentResult> findCommentSentimentResultsByCommentIds(List<String> commentId);
     List<CommentSentimentResult> findCommentSentimentResultsByVideoIdAndSentimentObject(String videoId, String sentimentObject, Pageable pageable);
     void deleteByVideoId(String videoId);
+    long deleteByCreateDateBefore(LocalDateTime date);
 }

@@ -1,6 +1,9 @@
 package com.acme.model.comment;
 
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @Document(collection = "concise_comments")
-public class ConciseComment {
+public class ConciseComment implements Persistable<String> {
     @Id
     private String commentId;
     private String jobId;
@@ -29,6 +32,10 @@ public class ConciseComment {
     @Indexed
     private LocalDateTime publishedAt;
     private LocalDateTime updatedAt;
+    @CreatedDate
+    private LocalDateTime createDate;
+    @LastModifiedDate
+    private LocalDateTime updateDate;
 
     public String getJobId() {
         return jobId;
@@ -148,5 +155,31 @@ public class ConciseComment {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
+    }
+
+    @Override
+    public String getId() {
+        return commentId;
+    }
+
+    @Override
+    public boolean isNew() {
+        return createDate == null;
     }
 }

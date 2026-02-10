@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,8 +23,13 @@ public class AnalysisResultPersistInMemory implements AnalysisResultPersistence 
             return;
         }
 
+        LocalDateTime now = LocalDateTime.now();
         Set<String> newCommentSentimentResultSet = new HashSet<>();
         for (CommentSentimentResult result : commentSentimentResults) {
+            if (result.getCreateDate() == null) {
+                result.setCreateDate(now);
+            }
+            result.setUpdateDate(now);
             String sentimentResultId = UUID.randomUUID().toString();
             commentSentimentResultMap.put(sentimentResultId, result);
             newCommentSentimentResultSet.add(sentimentResultId);

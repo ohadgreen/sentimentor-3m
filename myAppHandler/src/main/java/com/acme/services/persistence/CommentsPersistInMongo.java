@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -18,7 +19,17 @@ public class CommentsPersistInMongo implements CommentsPersistence {
 
     @Override
     public void saveConciseComments(List<ConciseComment> conciseCommentList) {
-        List<ConciseComment> conciseComments = conciseCommentRepository.saveAll(conciseCommentList);
+        if (conciseCommentList.isEmpty()) {
+            return;
+        }
+        LocalDateTime now = LocalDateTime.now();
+        conciseCommentList.forEach(comment -> {
+            if (comment.getCreateDate() == null) {
+                comment.setCreateDate(now);
+            }
+            comment.setUpdateDate(now);
+        });
+        conciseCommentRepository.saveAll(conciseCommentList);
     }
 
     @Override

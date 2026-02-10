@@ -1,7 +1,9 @@
 package com.acme.model.comment;
 
 import common.model.analysisrequest.Sentiment;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.index.CompoundIndex;
 import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -25,6 +27,10 @@ public class CommentSentimentResult {
     private String sentimentObject;
     private Sentiment sentiment;
     private String sentimentReason;
+    @CreatedDate
+    private LocalDateTime createDate;
+    @LastModifiedDate
+    private LocalDateTime updateDate;
 
     public CommentSentimentResult(String commentId, String videoId, Integer likeCount, LocalDateTime publishedAt, String sentimentObject, Sentiment sentiment, String sentimentReason) {
         this.commentId = commentId;
@@ -101,5 +107,21 @@ public class CommentSentimentResult {
 
     public void setSentimentReason(String sentimentReason) {
         this.sentimentReason = sentimentReason;
+    }
+
+    public LocalDateTime getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    public LocalDateTime getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(LocalDateTime updateDate) {
+        this.updateDate = updateDate;
     }
 }

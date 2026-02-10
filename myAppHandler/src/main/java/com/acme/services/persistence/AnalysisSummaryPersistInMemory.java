@@ -4,6 +4,7 @@ import com.acme.model.comment.VideoCommentsSummary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +15,13 @@ public class AnalysisSummaryPersistInMemory implements AnalysisSummaryPersistenc
     public Map<String, VideoCommentsSummary> commentsAnalyzeSummaryMap = new HashMap<>();
     @Override
     public void saveAnalysisSummary(VideoCommentsSummary videoCommentsSummary) {
+        LocalDateTime now = LocalDateTime.now();
         if (commentsAnalyzeSummaryMap.containsKey(videoCommentsSummary.getVideoId())) {
+            videoCommentsSummary.setUpdateDate(now);
             commentsAnalyzeSummaryMap.replace(videoCommentsSummary.getVideoId(), videoCommentsSummary);
         } else {
+            videoCommentsSummary.setCreateDate(now);
+            videoCommentsSummary.setUpdateDate(now);
             commentsAnalyzeSummaryMap.put(videoCommentsSummary.getVideoId(), videoCommentsSummary);
         }
     }
@@ -28,9 +33,12 @@ public class AnalysisSummaryPersistInMemory implements AnalysisSummaryPersistenc
 
     @Override
     public void updateAnalysisSummary(String videoId, VideoCommentsSummary videoCommentsSummary) {
+        LocalDateTime now = LocalDateTime.now();
+        videoCommentsSummary.setUpdateDate(now);
         if (commentsAnalyzeSummaryMap.containsKey(videoId)) {
             commentsAnalyzeSummaryMap.replace(videoId, videoCommentsSummary);
         } else {
+            videoCommentsSummary.setCreateDate(now);
             commentsAnalyzeSummaryMap.put(videoId, videoCommentsSummary);
         }
     }

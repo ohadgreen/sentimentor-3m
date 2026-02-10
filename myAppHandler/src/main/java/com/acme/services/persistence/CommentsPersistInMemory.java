@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -22,6 +23,13 @@ public class CommentsPersistInMemory implements CommentsPersistence {
         if (conciseCommentList.isEmpty()) {
             return;
         }
+        LocalDateTime now = LocalDateTime.now();
+        conciseCommentList.forEach(comment -> {
+            if (comment.getCreateDate() == null) {
+                comment.setCreateDate(now);
+            }
+            comment.setUpdateDate(now);
+        });
         String videoId = conciseCommentList.getFirst().getVideoId();
         if (conciseCommentsMap.containsKey(videoId)) {
             logger.warn("videoId exists in map");

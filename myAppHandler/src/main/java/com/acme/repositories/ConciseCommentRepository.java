@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ConciseCommentRepository extends MongoRepository<ConciseComment, String> {
@@ -12,4 +13,5 @@ public interface ConciseCommentRepository extends MongoRepository<ConciseComment
     List<ConciseComment> findConciseCommentByVideoId(String videoId);
     Page<ConciseComment> findConciseCommentByVideoId(String videoId, Pageable pageable);
     void deleteByVideoId(String videoId);
+    long deleteByCreateDateBefore(LocalDateTime date);
 }
