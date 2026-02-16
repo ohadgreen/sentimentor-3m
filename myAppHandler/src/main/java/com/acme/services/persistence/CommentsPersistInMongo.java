@@ -50,7 +50,7 @@ public class CommentsPersistInMongo implements CommentsPersistence {
 
     @Override
     public List<ConciseComment> findByVideoIdAndCommentIdIn(String videoId, List<String> commentIds) {
-        return List.of();
+        return conciseCommentRepository.findByVideoIdAndCommentIdIn(videoId, commentIds);
     }
 
 

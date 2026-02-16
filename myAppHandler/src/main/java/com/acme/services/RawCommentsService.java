@@ -2,18 +2,24 @@ package com.acme.services;
 
 import com.acme.model.analysisreq.VideoCommentsRequest;
 import com.acme.model.comment.CommentDto;
+import com.acme.model.comment.CommentSentimentResult;
+import com.acme.model.comment.SentimentResultDto;
 import com.acme.model.comment.VideoCommentsSummary;
 import com.acme.model.comment.ConciseComment;
 import com.acme.model.ytrawcomment.Comment;
 import com.acme.model.ytrawcomment.CommentThread;
+import com.acme.services.persistence.AnalysisResultPersistence;
 import com.acme.services.persistence.AnalysisSummaryPersistence;
 import com.acme.services.persistence.CommentsPersistence;
+import common.model.analysisrequest.Sentiment;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 @Service
 public class RawCommentsService {
@@ -21,16 +27,18 @@ public class RawCommentsService {
     private final CommentsPersistence commentsPersistence;
     private final AnalysisSummaryPersistence analysisSummaryPersistence;
     private final WordCountService wordCountService;
+    private final AnalysisResultPersistence analysisResultPersistence;
     private static final int MAX_WORDS_FREQUENCIES = 10;
     private final static int MAX_TOP_COMMENTS = 50;
     private final static int MAX_WORDS_IN_COMMENT = 50;
 
 
-    public RawCommentsService(GetYouTubeRawComments getYouTubeRawComments, CommentsPersistence commentsPersistence, AnalysisSummaryPersistence analysisSummaryPersistence, WordCountService wordCountService) {
+    public RawCommentsService(GetYouTubeRawComments getYouTubeRawComments, CommentsPersistence commentsPersistence, AnalysisSummaryPersistence analysisSummaryPersistence, WordCountService wordCountService, AnalysisResultPersistence analysisResultPersistence) {
         this.getYouTubeRawComments = getYouTubeRawComments;
         this.commentsPersistence = commentsPersistence;
         this.analysisSummaryPersistence = analysisSummaryPersistence;
         this.wordCountService = wordCountService;
+        this.analysisResultPersistence = analysisResultPersistence;
     }
 
     public Page<ConciseComment> getConciseCommentList(String videoId, int limit) {
@@ -40,6 +48,76 @@ public class RawCommentsService {
     public Page<ConciseComment> getConciseCommentPage(String videoId, int pageNumber, int pageSize) {
         Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
         return commentsPersistence.getCommentsPageByVideoId(videoId, pageable);
+    }
+
+    public Page<CommentDto> getConciseCommentPage(String videoId, int pageNumber, int pageSize, String sentimentObject, Sentiment sentiment) {
+        Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
+
+        if (sentimentObject != null && sentiment != null) {
+            Page<CommentSentimentResult> sentimentPage = analysisResultPersistence
+                    .getCommentSentimentResultsPageByVideoIdAndSentimentObjectAndSentiment(videoId, sentimentObject, sentiment, pageable);
+
+            List<String> commentIds = sentimentPage.getContent().stream()
+                    .map(CommentSentimentResult::getCommentId)
+                    .collect(Collectors.toList());
+
+            Map<String, ConciseComment> commentMap = commentsPersistence.findByVideoIdAndCommentIdIn(videoId, commentIds).stream()
+                    .collect(Collectors.toMap(ConciseComment::getCommentId, c -> c));
+
+            Map<String, List<SentimentResultDto>> sentimentsByCommentId = buildSentimentsByCommentId(videoId, commentIds);
+
+            List<CommentDto> mappedList = sentimentPage.getContent().stream()
+                    .map(sentimentResult -> {
+                        ConciseComment conciseComment = commentMap.get(sentimentResult.getCommentId());
+                        if (conciseComment == null) return null;
+                        return new CommentDto(
+                                conciseComment.getCommentId(),
+                                conciseComment.getTextOriginal(),
+                                conciseComment.getLikeCount(),
+                                conciseComment.getAuthorDisplayName(),
+                                conciseComment.getAuthorProfileImageUrl(),
+                                conciseComment.getPublishedAt(),
+                                sentimentsByCommentId.getOrDefault(conciseComment.getCommentId(), List.of())
+                        );
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            return new PageImpl<>(mappedList, pageable, sentimentPage.getTotalElements());
+        }
+
+        Page<ConciseComment> page = commentsPersistence.getCommentsPageByVideoId(videoId, pageable);
+
+        List<String> commentIds = page.getContent().stream()
+                .map(ConciseComment::getCommentId)
+                .collect(Collectors.toList());
+
+        Map<String, List<SentimentResultDto>> sentimentsByCommentId = buildSentimentsByCommentId(videoId, commentIds);
+
+        List<CommentDto> mappedList = page.getContent().stream()
+                .map(conciseComment -> new CommentDto(
+                        conciseComment.getCommentId(),
+                        conciseComment.getTextOriginal(),
+                        conciseComment.getLikeCount(),
+                        conciseComment.getAuthorDisplayName(),
+                        conciseComment.getAuthorProfileImageUrl(),
+                        conciseComment.getPublishedAt(),
+                        sentimentsByCommentId.getOrDefault(conciseComment.getCommentId(), List.of())
+                ))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(mappedList, pageable, page.getTotalElements());
+    }
+
+    private Map<String, List<SentimentResultDto>> buildSentimentsByCommentId(String videoId, List<String> commentIds) {
+        List<CommentSentimentResult> allSentiments = analysisResultPersistence
+                .getCommentSentimentResultsByVideoIdAndCommentIdIn(videoId, commentIds);
+        Map<String, List<SentimentResultDto>> result = new HashMap<>();
+        for (CommentSentimentResult r : allSentiments) {
+            result.computeIfAbsent(r.getCommentId(), k -> new ArrayList<>())
+                    .add(new SentimentResultDto(r.getSentimentObject(), r.getSentiment(), r.getSentimentReason()));
+        }
+        return result;
     }
 
     public VideoCommentsSummary getRawVideoComments(VideoCommentsRequest videoCommentsRequest) {

@@ -6,7 +6,7 @@ spring:
     openai:
       api-key: ${OPENAI_API_KEY}
       chat:
-        model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+        model: ${OPENAI_CHAT_MODEL:gpt-5-nano}
 
 
 consumer:

@@ -1,7 +1,10 @@
 package com.acme.services.persistence;
 
 import com.acme.model.comment.CommentSentimentResult;
+import common.model.analysisrequest.Sentiment;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -77,6 +80,24 @@ public class AnalysisResultPersistInMemory implements AnalysisResultPersistence 
     public List<CommentSentimentResult> getCommentSentimentResultsByVideoIdAndSentimentObject(String videoId, String sentimentObject, Pageable pageable) {
         // TODO: Implement pagination and sorting logic
         return new ArrayList<>();
+    }
+
+    @Override
+    public List<CommentSentimentResult> getCommentSentimentResultsByVideoIdAndSentimentObjectAndCommentIdIn(
+            String videoId, String sentimentObject, List<String> commentIds) {
+        return List.of();
+    }
+
+    @Override
+    public Page<CommentSentimentResult> getCommentSentimentResultsPageByVideoIdAndSentimentObjectAndSentiment(
+            String videoId, String sentimentObject, Sentiment sentiment, Pageable pageable) {
+        return new PageImpl<>(List.of());
+    }
+
+    @Override
+    public List<CommentSentimentResult> getCommentSentimentResultsByVideoIdAndCommentIdIn(
+            String videoId, List<String> commentIds) {
+        return List.of();
     }
 
     @Override

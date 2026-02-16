@@ -2,8 +2,10 @@ package com.acme.services.persistence;
 
 import com.acme.model.comment.CommentSentimentResult;
 import com.acme.repositories.CommentSentimentRepository;
+import common.model.analysisrequest.Sentiment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -50,6 +52,24 @@ public class AnalysisResultPersistInMongo implements AnalysisResultPersistence {
         );
 
         return commentSentimentRepository.findCommentSentimentResultsByVideoIdAndSentimentObject(videoId, sentimentObject, sortedPageable);
+    }
+
+    @Override
+    public List<CommentSentimentResult> getCommentSentimentResultsByVideoIdAndSentimentObjectAndCommentIdIn(
+            String videoId, String sentimentObject, List<String> commentIds) {
+        return commentSentimentRepository.findByVideoIdAndSentimentObjectAndCommentIdIn(videoId, sentimentObject, commentIds);
+    }
+
+    @Override
+    public Page<CommentSentimentResult> getCommentSentimentResultsPageByVideoIdAndSentimentObjectAndSentiment(
+            String videoId, String sentimentObject, Sentiment sentiment, Pageable pageable) {
+        return commentSentimentRepository.findByVideoIdAndSentimentObjectAndSentiment(videoId, sentimentObject, sentiment, pageable);
+    }
+
+    @Override
+    public List<CommentSentimentResult> getCommentSentimentResultsByVideoIdAndCommentIdIn(
+            String videoId, List<String> commentIds) {
+        return commentSentimentRepository.findByVideoIdAndCommentIdIn(videoId, commentIds);
     }
 
     @Override
