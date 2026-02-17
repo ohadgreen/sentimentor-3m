@@ -51,6 +51,10 @@ public class RawCommentsService {
     }
 
     public Page<CommentDto> getConciseCommentPage(String videoId, int pageNumber, int pageSize, String sentimentObject, Sentiment sentiment) {
+        return getConciseCommentPage(videoId, pageNumber, pageSize, sentimentObject, sentiment, null);
+    }
+
+    public Page<CommentDto> getConciseCommentPage(String videoId, int pageNumber, int pageSize, String sentimentObject, Sentiment sentiment, String keyword) {
         Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
 
         if (sentimentObject != null && sentiment != null) {
@@ -61,7 +65,11 @@ public class RawCommentsService {
                     .map(CommentSentimentResult::getCommentId)
                     .collect(Collectors.toList());
 
-            Map<String, ConciseComment> commentMap = commentsPersistence.findByVideoIdAndCommentIdIn(videoId, commentIds).stream()
+            List<ConciseComment> comments = keyword != null && !keyword.isBlank()
+                    ? commentsPersistence.findByVideoIdAndCommentIdInAndKeyword(videoId, commentIds, keyword)
+                    : commentsPersistence.findByVideoIdAndCommentIdIn(videoId, commentIds);
+
+            Map<String, ConciseComment> commentMap = comments.stream()
                     .collect(Collectors.toMap(ConciseComment::getCommentId, c -> c));
 
             Map<String, List<SentimentResultDto>> sentimentsByCommentId = buildSentimentsByCommentId(videoId, commentIds);
@@ -86,7 +94,9 @@ public class RawCommentsService {
             return new PageImpl<>(mappedList, pageable, sentimentPage.getTotalElements());
         }
 
-        Page<ConciseComment> page = commentsPersistence.getCommentsPageByVideoId(videoId, pageable);
+        Page<ConciseComment> page = keyword != null && !keyword.isBlank()
+                ? commentsPersistence.getCommentsPageByVideoIdAndKeyword(videoId, keyword, pageable)
+                : commentsPersistence.getCommentsPageByVideoId(videoId, pageable);
 
         List<String> commentIds = page.getContent().stream()
                 .map(ConciseComment::getCommentId)

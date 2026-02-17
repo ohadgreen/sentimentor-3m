@@ -24,8 +24,9 @@ public class CommentsController {
             @RequestParam(defaultValue = "0") int pageNumber,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(required = false) String sentimentObject,
-            @RequestParam(required = false) Sentiment sentiment) {
-        return rawCommentsService.getConciseCommentPage(videoId, pageNumber, pageSize, sentimentObject, sentiment);
+            @RequestParam(required = false) Sentiment sentiment,
+            @RequestParam(required = false) String keyword) {
+        return rawCommentsService.getConciseCommentPage(videoId, pageNumber, pageSize, sentimentObject, sentiment, keyword);
     }
 
 

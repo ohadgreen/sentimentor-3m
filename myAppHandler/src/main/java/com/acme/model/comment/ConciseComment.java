@@ -27,6 +27,7 @@ public class ConciseComment implements Persistable<String> {
     private boolean canRate;
     @Indexed
     private Integer likeCount;
+    @Indexed
     private Set<String> words;
     private String viewerRating;
     @Indexed

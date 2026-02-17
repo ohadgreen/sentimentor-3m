@@ -53,6 +53,26 @@ public class CommentsPersistInMongo implements CommentsPersistence {
         return conciseCommentRepository.findByVideoIdAndCommentIdIn(videoId, commentIds);
     }
 
+    @Override
+    public Page<ConciseComment> getCommentsPageByVideoIdAndKeyword(String videoId, String keyword, Pageable pageable) {
+        Sort defaultSort = Sort.by(
+                Sort.Order.desc("likeCount"),
+                Sort.Order.desc("publishedAt")
+        );
+
+        Pageable sortedPageable = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pageable.getSort().isSorted() ? pageable.getSort() : defaultSort
+        );
+
+        return conciseCommentRepository.findByVideoIdAndWords(videoId, keyword.toLowerCase(), sortedPageable);
+    }
+
+    @Override
+    public List<ConciseComment> findByVideoIdAndCommentIdInAndKeyword(String videoId, List<String> commentIds, String keyword) {
+        return conciseCommentRepository.findByVideoIdAndCommentIdInAndWords(videoId, commentIds, keyword.toLowerCase());
+    }
 
     @Override
     public void removeCommentsByVideoId(String videoId) {

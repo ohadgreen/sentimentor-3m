@@ -10,5 +10,7 @@ public interface CommentsPersistence {
     void saveConciseComments(List<ConciseComment> conciseCommentList);
     Page<ConciseComment> getCommentsPageByVideoId(String videoId, Pageable pageable);
     List<ConciseComment> findByVideoIdAndCommentIdIn(String videoId, List<String> commentIds);
+    Page<ConciseComment> getCommentsPageByVideoIdAndKeyword(String videoId, String keyword, Pageable pageable);
+    List<ConciseComment> findByVideoIdAndCommentIdInAndKeyword(String videoId, List<String> commentIds, String keyword);
     void removeCommentsByVideoId(String videoId);
 }

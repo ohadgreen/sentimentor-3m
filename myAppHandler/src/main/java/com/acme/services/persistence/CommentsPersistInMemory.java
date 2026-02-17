@@ -75,6 +75,15 @@ public class CommentsPersistInMemory implements CommentsPersistence {
         return List.of();
     }
 
+    @Override
+    public Page<ConciseComment> getCommentsPageByVideoIdAndKeyword(String videoId, String keyword, Pageable pageable) {
+        return Page.empty();
+    }
+
+    @Override
+    public List<ConciseComment> findByVideoIdAndCommentIdInAndKeyword(String videoId, List<String> commentIds, String keyword) {
+        return List.of();
+    }
 
     @Override
     public void removeCommentsByVideoId(String videoId) {
