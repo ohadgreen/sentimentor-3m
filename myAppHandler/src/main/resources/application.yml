@@ -10,6 +10,8 @@ spring:
 youtube:
   api:
     base-url: https://youtube.googleapis.com/youtube/v3/commentThreads
+    search-url: https://youtube.googleapis.com/youtube/v3/search
+    videos-url: https://youtube.googleapis.com/youtube/v3/videos
     key: ${YOUTUBE_API_KEY}
 
 app:

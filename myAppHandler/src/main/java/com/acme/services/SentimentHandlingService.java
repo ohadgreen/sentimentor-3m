@@ -26,6 +26,7 @@ public class SentimentHandlingService {
     private final Logger logger = getLogger(SentimentHandlingService.class);
     private static final int DEFAULT_PAGE_SIZE = 10;
     private static final int PARALLEL_CHUNKS_COUNT = 2;
+    private static final int MAX_COMMENT_TEXT_LENGTH = 300;
 
     private final ConcurrentHashMap<UUID, CommentSentimentSummary> sentimentWorkerTrackMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, Object> analysisLocks = new ConcurrentHashMap<>();
@@ -296,12 +297,18 @@ public class SentimentHandlingService {
         Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
         return commentsPersistence.getCommentsPageByVideoId(videoId, pageable)
                 .stream()
-                .map(comment -> new CommentToAnalyze(
-                        comment.getCommentId(),
-                        comment.getTextDisplay(),
-                        comment.getLikeCount(),
-                        comment.getPublishedAt()
-                ))
+                .map(comment -> {
+                    String text = comment.getTextDisplay();
+                    if (text != null && text.length() > MAX_COMMENT_TEXT_LENGTH) {
+                        text = text.substring(0, MAX_COMMENT_TEXT_LENGTH);
+                    }
+                    return new CommentToAnalyze(
+                            comment.getCommentId(),
+                            text,
+                            comment.getLikeCount(),
+                            comment.getPublishedAt()
+                    );
+                })
                 .toList();
     }
 
