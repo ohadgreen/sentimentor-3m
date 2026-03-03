@@ -11,9 +11,8 @@ import common.model.analysisrequest.*;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
-import org.springframework.lang.Nullable;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,19 +30,19 @@ public class SentimentHandlingService {
     private final ConcurrentHashMap<UUID, CommentSentimentSummary> sentimentWorkerTrackMap = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<UUID, Object> analysisLocks = new ConcurrentHashMap<>();
 
-    @Value("${app.aiWorker.base-url}")
-    private String aiWorkerBaseUrl;
+    @Value("${jms.queues.analysis-request}")
+    private String analysisRequestQueue;
 
     private final AnalysisSummaryPersistence analysisSummaryPersistence;
     private final CommentsPersistence commentsPersistence;
     private final AnalysisResultPersistence analysisResultPersistence;
-    private final RestTemplate restTemplate;
+    private final JmsTemplate jmsTemplate;
 
-    public SentimentHandlingService(AnalysisSummaryPersistence analysisSummaryPersistence, CommentsPersistence commentsPersistence, AnalysisResultPersistence analysisResultPersistence, RestTemplate restTemplate) {
+    public SentimentHandlingService(AnalysisSummaryPersistence analysisSummaryPersistence, CommentsPersistence commentsPersistence, AnalysisResultPersistence analysisResultPersistence, JmsTemplate jmsTemplate) {
         this.analysisSummaryPersistence = analysisSummaryPersistence;
         this.commentsPersistence = commentsPersistence;
         this.analysisResultPersistence = analysisResultPersistence;
-        this.restTemplate = restTemplate;
+        this.jmsTemplate = jmsTemplate;
     }
 
     public CommentSentimentSummary getOngoingSentimentAnalysis(String videoId, UUID analysisId) {
@@ -92,6 +91,17 @@ public class SentimentHandlingService {
             return null;
         }
 
+        String videoTitle = commentsAnalysisSummary.getVideoTitle();
+
+        String moreInfo = sentimentAnalysisRequest.getMoreInfo();
+        if (moreInfo == null || moreInfo.isBlank()) {
+            String description = commentsAnalysisSummary.getDescription();
+            if (description != null && !description.isBlank()) {
+                moreInfo = description.length() > 100 ? description.substring(0, 100) : description;
+            }
+        }
+        sentimentAnalysisRequest.setMoreInfo(moreInfo);
+
         int totalCommentsForVideo = commentsAnalysisSummary.getTotalComments();
         int totalCommentsToAnalyze = Math.min(sentimentAnalysisRequest.getTotalCommentsToAnalyze(), totalCommentsForVideo);
 
@@ -109,9 +119,9 @@ public class SentimentHandlingService {
             SentimentAnalysisChunkRequest analysisChunkRequest = new SentimentAnalysisChunkRequest(
                     analysisId,
                     videoId,
-                    commentsAnalysisSummary.getVideoTitle(),
+                    videoTitle,
                     sentimentObject,
-                    sentimentAnalysisRequest.getMoreInfo(),
+                    moreInfo,
                     totalCommentsToAnalyze,
                     analysisChunkId,
                     commentsPage,
@@ -126,7 +136,7 @@ public class SentimentHandlingService {
         logger.info("@@@ Sentiment analysis request created for videoId: {}, analysisId: {}, chunks count: {}", videoId, analysisId, processingChunkIds.size());
 
         CommentSentimentSummary commentSentimentSummary =
-                new CommentSentimentSummary(videoId, analysisId, commentsAnalysisSummary.getVideoTitle(), sentimentObject, sentimentAnalysisRequest.getMoreInfo());
+                new CommentSentimentSummary(videoId, analysisId, videoTitle, sentimentObject, moreInfo);
         commentSentimentSummary.setAnalysisStatus(AnalysisStatus.IN_PROGRESS);
         commentSentimentSummary.setTotalCommentsToAnalyze(totalCommentsToAnalyze);
         commentSentimentSummary.setProcessingChunkIds(processingChunkIds);
@@ -313,14 +323,8 @@ public class SentimentHandlingService {
     }
 
     private void callAiWorkerForChunkAnalysis(SentimentAnalysisChunkRequest analysisChunkRequest) {
-        String url = aiWorkerBaseUrl + "/queue";
-        try {
-            String response = restTemplate.postForObject(url, analysisChunkRequest, String.class);
-            logger.info("@@@ AI Worker: {} ", response);
-        } catch (Exception e) {
-            logger.error("Error communicating with AI Worker for videoId: {} - {}",
-                    analysisChunkRequest.getVideoId(), e.getMessage());
-        }
+        jmsTemplate.convertAndSend(analysisRequestQueue, analysisChunkRequest);
+        logger.info("@@@ Sent chunk to AI Worker queue for videoId: {}", analysisChunkRequest.getVideoId());
     }
 
     private List<CommentSentimentResult> convertToAnalysisResultList(List<CommentToAnalyze> commentsSentimentAnalysisList, String videoId, String sentimentObject) {

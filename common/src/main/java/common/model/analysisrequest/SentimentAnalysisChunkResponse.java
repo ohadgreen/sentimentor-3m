@@ -9,6 +9,8 @@ public class SentimentAnalysisChunkResponse {
     private UUID analysisChunkId;
     private List<CommentToAnalyze> commentSentiments;
 
+    public SentimentAnalysisChunkResponse() {}
+
     public SentimentAnalysisChunkResponse(UUID sentimentAnalysisId, UUID analysisChunkId, List<CommentToAnalyze> commentSentiments) {
         this.analysisId = sentimentAnalysisId;
         this.analysisChunkId = analysisChunkId;

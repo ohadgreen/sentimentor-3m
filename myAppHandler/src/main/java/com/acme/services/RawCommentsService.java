@@ -8,6 +8,8 @@ import com.acme.model.comment.VideoCommentsSummary;
 import com.acme.model.comment.ConciseComment;
 import com.acme.model.ytrawcomment.Comment;
 import com.acme.model.ytrawcomment.CommentThread;
+import com.acme.model.ytsearch.VideoDetailsItem;
+import com.acme.model.ytsearch.VideoSnippet;
 import com.acme.services.persistence.AnalysisResultPersistence;
 import com.acme.services.persistence.AnalysisSummaryPersistence;
 import com.acme.services.persistence.CommentsPersistence;
@@ -18,40 +20,30 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
 @Service
 public class RawCommentsService {
     private final GetYouTubeRawComments getYouTubeRawComments;
+    private final GetYouTubeVideoSnippets getYouTubeVideoSnippets;
     private final CommentsPersistence commentsPersistence;
     private final AnalysisSummaryPersistence analysisSummaryPersistence;
     private final WordCountService wordCountService;
     private final AnalysisResultPersistence analysisResultPersistence;
     private static final int MAX_WORDS_FREQUENCIES = 10;
-    private final static int MAX_TOP_COMMENTS = 50;
     private final static int MAX_WORDS_IN_COMMENT = 50;
+    private final ConcurrentHashMap<String, Object> videoProcessingLocks = new ConcurrentHashMap<>();
 
 
-    public RawCommentsService(GetYouTubeRawComments getYouTubeRawComments, CommentsPersistence commentsPersistence, AnalysisSummaryPersistence analysisSummaryPersistence, WordCountService wordCountService, AnalysisResultPersistence analysisResultPersistence) {
+    public RawCommentsService(GetYouTubeRawComments getYouTubeRawComments, GetYouTubeVideoSnippets getYouTubeVideoSnippets, CommentsPersistence commentsPersistence, AnalysisSummaryPersistence analysisSummaryPersistence, WordCountService wordCountService, AnalysisResultPersistence analysisResultPersistence) {
         this.getYouTubeRawComments = getYouTubeRawComments;
+        this.getYouTubeVideoSnippets = getYouTubeVideoSnippets;
         this.commentsPersistence = commentsPersistence;
         this.analysisSummaryPersistence = analysisSummaryPersistence;
         this.wordCountService = wordCountService;
         this.analysisResultPersistence = analysisResultPersistence;
-    }
-
-    public Page<ConciseComment> getConciseCommentList(String videoId, int limit) {
-        return commentsPersistence.getCommentsPageByVideoId(videoId, Pageable.ofSize(limit));
-    }
-
-    public Page<ConciseComment> getConciseCommentPage(String videoId, int pageNumber, int pageSize) {
-        Pageable pageable = Pageable.ofSize(pageSize).withPage(pageNumber);
-        return commentsPersistence.getCommentsPageByVideoId(videoId, pageable);
-    }
-
-    public Page<CommentDto> getConciseCommentPage(String videoId, int pageNumber, int pageSize, String sentimentObject, Sentiment sentiment) {
-        return getConciseCommentPage(videoId, pageNumber, pageSize, sentimentObject, sentiment, null);
     }
 
     public Page<CommentDto> getConciseCommentPage(String videoId, int pageNumber, int pageSize, String sentimentObject, Sentiment sentiment, String keyword) {
@@ -135,10 +127,21 @@ public class RawCommentsService {
 
         VideoCommentsSummary commentsAnalysisSummary = analysisSummaryPersistence.getCommentsAnalysisSummary(videoId);
         if (commentsAnalysisSummary != null) {
-            System.out.println("Comments analysis summary already exists for videoId: " + videoId);
             return commentsAnalysisSummary;
         }
 
+        Object lock = videoProcessingLocks.computeIfAbsent(videoId, k -> new Object());
+        synchronized (lock) {
+            // Re-check inside the lock — another thread may have completed processing while we waited
+            commentsAnalysisSummary = analysisSummaryPersistence.getCommentsAnalysisSummary(videoId);
+            if (commentsAnalysisSummary != null) {
+                return commentsAnalysisSummary;
+            }
+            return processAndSaveVideoComments(videoCommentsRequest, videoId);
+        }
+    }
+
+    private VideoCommentsSummary processAndSaveVideoComments(VideoCommentsRequest videoCommentsRequest, String videoId) {
         int totalCommentsCount = 0;
         String nextPageToken = null;
         
@@ -169,26 +172,26 @@ public class RawCommentsService {
 
         commentsPersistence.saveConciseComments(allConciseComments);
 
-        List<ConciseComment> topRatedComments = allConciseComments.stream()
-                .sorted(Comparator.comparingInt(ConciseComment::getLikeCount).reversed())
-                .limit(MAX_TOP_COMMENTS)
-                .toList();
-
-        List<CommentDto> topCommentsDtoList = topRatedComments.stream()
-                .map(conciseComment -> new CommentDto(
-                        conciseComment.getTextOriginal(),
-                        conciseComment.getLikeCount(),
-                        conciseComment.getAuthorDisplayName(),
-                        conciseComment.getAuthorProfileImageUrl(),
-                        conciseComment.getPublishedAt()))
-                .toList();
-
         VideoCommentsSummary videoCommentsSummary = new VideoCommentsSummary();
         videoCommentsSummary.setVideoId(videoId);
         videoCommentsSummary.setTotalComments(totalCommentsCount);
         videoCommentsSummary.setWordsFrequency(calculateTopWordsFrequencies(sortedWordCountsMap));
 
+        VideoDetailsItem videoDetails = getYouTubeVideoSnippets.getVideoDetails(videoId);
+        if (videoDetails != null) {
+            videoCommentsSummary.setStatistics(videoDetails.getStatistics());
+            VideoSnippet snippet = videoDetails.getSnippet();
+            if (snippet != null) {
+                videoCommentsSummary.setVideoTitle(snippet.getTitle());
+                videoCommentsSummary.setThumbnails(snippet.getThumbnails());
+                videoCommentsSummary.setDescription(snippet.getDescription());
+                videoCommentsSummary.setChannelTitle(snippet.getChannelTitle());
+                videoCommentsSummary.setPublishTime(snippet.getPublishedAt());
+            }
+        }
+
         analysisSummaryPersistence.saveAnalysisSummary(videoCommentsSummary);
+        videoProcessingLocks.remove(videoId);
         return videoCommentsSummary;
     }
 

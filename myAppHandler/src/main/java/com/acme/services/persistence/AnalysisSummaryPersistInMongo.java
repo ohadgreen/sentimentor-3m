@@ -4,7 +4,10 @@ import com.acme.model.comment.VideoCommentsSummary;
 import com.acme.repositories.AnalysisSummaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Profile("db")
@@ -16,14 +19,18 @@ public class AnalysisSummaryPersistInMongo implements AnalysisSummaryPersistence
     @Override
     public void saveAnalysisSummary(VideoCommentsSummary videoCommentsSummary) {
         if (videoCommentsSummary == null || videoCommentsSummary.getVideoId() == null) {
-            return; // Avoid saving null or incomplete summaries
+            return;
         }
-        VideoCommentsSummary existingSummary = analysisSummaryRepository.findByVideoId(videoCommentsSummary.getVideoId());
-        if (existingSummary != null) {
-            existingSummary.setWordsFrequency(videoCommentsSummary.getWordsFrequency());
-            analysisSummaryRepository.save(existingSummary);
-        } else {
-            analysisSummaryRepository.save(videoCommentsSummary);
+        try {
+            VideoCommentsSummary existingSummary = analysisSummaryRepository.findByVideoId(videoCommentsSummary.getVideoId());
+            if (existingSummary != null) {
+                existingSummary.setWordsFrequency(videoCommentsSummary.getWordsFrequency());
+                analysisSummaryRepository.save(existingSummary);
+            } else {
+                analysisSummaryRepository.save(videoCommentsSummary);
+            }
+        } catch (DuplicateKeyException e) {
+            // Another thread inserted the document concurrently — safe to ignore
         }
     }
 
@@ -46,5 +53,10 @@ public class AnalysisSummaryPersistInMongo implements AnalysisSummaryPersistence
     @Override
     public void deleteAnalysisSummary(String videoId) {
         analysisSummaryRepository.deleteByVideoId(videoId);
+    }
+
+    @Override
+    public List<VideoCommentsSummary> getLatestVideoSummaries() {
+        return analysisSummaryRepository.findTop6ByOrderByCreateDateDesc();
     }
 }

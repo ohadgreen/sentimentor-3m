@@ -6,7 +6,6 @@ import java.util.UUID;
 public class SentimentAnalysisRequest implements Serializable {
     private UUID analysisId;
     private String videoId;
-    private String videoTitle;
     private String analysisObject;
     private String moreInfo;
     private int totalCommentsToAnalyze;
@@ -15,18 +14,16 @@ public class SentimentAnalysisRequest implements Serializable {
     public SentimentAnalysisRequest() {
     }
 
-    public SentimentAnalysisRequest(UUID analysisId, String videoId, String videoTitle, String analysisObject, String moreInfo, int totalCommentsToAnalyze) {
+    public SentimentAnalysisRequest(UUID analysisId, String videoId, String analysisObject, String moreInfo, int totalCommentsToAnalyze) {
         this.analysisId = analysisId;
         this.videoId = videoId;
-        this.videoTitle = videoTitle;
         this.analysisObject = analysisObject;
         this.moreInfo = moreInfo;
         this.totalCommentsToAnalyze = totalCommentsToAnalyze;
     }
 
-    public SentimentAnalysisRequest(String analysisObject, String videoTitle, String moreInfo) {
+    public SentimentAnalysisRequest(String analysisObject, String moreInfo) {
         this.analysisObject = analysisObject;
-        this.videoTitle = videoTitle;
         this.moreInfo = moreInfo;
     }
 
@@ -60,14 +57,6 @@ public class SentimentAnalysisRequest implements Serializable {
 
     public void setAnalysisObject(String analysisObject) {
         this.analysisObject = analysisObject;
-    }
-
-    public String getVideoTitle() {
-        return videoTitle;
-    }
-
-    public void setVideoTitle(String videoTitle) {
-        this.videoTitle = videoTitle;
     }
 
     public String getMoreInfo() {

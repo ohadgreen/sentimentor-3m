@@ -1,5 +1,6 @@
 package com.acme.services;
 
+import com.acme.model.ytsearch.VideoDetailsItem;
 import com.acme.model.ytsearch.VideoDetailsResult;
 import com.acme.model.ytsearch.VideoSearchResult;
 import com.acme.model.ytsearch.VideoStatistics;
@@ -121,6 +122,36 @@ public class GetYouTubeVideoSnippets {
 
         } catch (IOException | URISyntaxException e) {
             logger.error("Error fetching video statistics for ids: {}", ids, e);
+        }
+    }
+
+    public VideoDetailsItem getVideoDetails(String videoId) {
+        String videosUri = videosBaseUrl
+                + "?key=" + apiKey
+                + "&part=snippet,statistics"
+                + "&id=" + videoId;
+
+        try {
+            URL url = new URI(videosUri).toURL();
+            logger.info("YouTube video details url: {}", url);
+
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("GET");
+
+            ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+            VideoDetailsResult detailsResult = objectMapper.readValue(connection.getInputStream(), VideoDetailsResult.class);
+
+            if (detailsResult == null || detailsResult.getItems() == null || detailsResult.getItems().isEmpty()) {
+                return null;
+            }
+
+            return detailsResult.getItems().get(0);
+
+        } catch (IOException | URISyntaxException e) {
+            logger.error("Error fetching video details for id: {}", videoId, e);
+            return null;
         }
     }
 

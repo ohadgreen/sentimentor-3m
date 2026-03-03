@@ -6,6 +6,10 @@ spring:
     mongodb:
       uri: ${MONGODB_URI}
       auto-index-creation: true
+  activemq:
+    broker-url: ${ACTIVEMQ_BROKER_URL:tcp://localhost:61616}
+    user: ${ACTIVEMQ_USER:admin}
+    password: ${ACTIVEMQ_PASSWORD:admin}
 
 youtube:
   api:
@@ -14,6 +18,7 @@ youtube:
     videos-url: https://youtube.googleapis.com/youtube/v3/videos
     key: ${YOUTUBE_API_KEY}
 
-app:
-  aiWorker:
-    base-url: ${AI_WORKER_PATH:http://localhost:8082/api/aiworker}
+jms:
+  queues:
+    analysis-request: sentiment.analysis.request
+    analysis-response: sentiment.analysis.response

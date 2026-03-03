@@ -15,8 +15,8 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -27,30 +27,23 @@ public class SentimentAnalysisService {
 
     private final Logger logger = LoggerFactory.getLogger(SentimentAnalysisService.class);
     private final ChatModel chatModel;
-    private final RestTemplate restTemplate;
+    private final JmsTemplate jmsTemplate;
 
     @Value("classpath:templates/comments-sentiment-analysis-prompt.st")
     private Resource sentimentAnalysisPrompt;
-    @Value("${app.handler.base-url}")
-    private String appHandlerBaseUrl;
+    @Value("${jms.queues.analysis-response}")
+    private String analysisResponseQueue;
 
-    public SentimentAnalysisService(ChatModel chatModel, RestTemplate restTemplate) {
+    public SentimentAnalysisService(ChatModel chatModel, JmsTemplate jmsTemplate) {
         this.chatModel = chatModel;
-        this.restTemplate = restTemplate;
+        this.jmsTemplate = jmsTemplate;
     }
 
     public void communicateAnalysisResponseFromRequest(SentimentAnalysisChunkRequest analysisRequest) {
         SentimentAnalysisChunkResponse chunkAnalysisResponse = analyzeCommentsChunk(analysisRequest);
 
         if (chunkAnalysisResponse != null) {
-
-            String url = appHandlerBaseUrl + "/sentimentChunk/handler";
-            try {
-                restTemplate.postForObject(url, chunkAnalysisResponse, String.class);
-            } catch (Exception e) {
-                logger.error("Error communicating with app handler for videoId: {} - {}", analysisRequest.getVideoId(), e.getMessage());
-            }
-
+            jmsTemplate.convertAndSend(analysisResponseQueue, chunkAnalysisResponse);
             logger.info("Sentiment analysis completed for request: {}", analysisRequest.getVideoId());
         } else {
             logger.error("Failed to analyze comments for request: {}", analysisRequest.getVideoId());

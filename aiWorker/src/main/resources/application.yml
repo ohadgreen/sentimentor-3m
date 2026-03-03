@@ -7,15 +7,14 @@ spring:
       api-key: ${OPENAI_API_KEY}
       chat:
         model: ${OPENAI_CHAT_MODEL:gpt-5-nano}
+  activemq:
+    broker-url: ${ACTIVEMQ_BROKER_URL:tcp://localhost:61616}
+    user: ${ACTIVEMQ_USER:admin}
+    password: ${ACTIVEMQ_PASSWORD:admin}
 
-
-consumer:
-  pool:
-    core-pool-size: ${CORE_POOL_SIZE:3}
-    max-pool-size: ${POOL_MAX_SIZE:8}
-    queue-capacity: 100
-    keep-alive-seconds: 60
-
-app:
-  handler:
-    base-url: ${APP_HANDLER_PATH:http://localhost:8081/api}
+jms:
+  queues:
+    analysis-request: sentiment.analysis.request
+    analysis-response: sentiment.analysis.response
+  listener:
+    concurrency: 5

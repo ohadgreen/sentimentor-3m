@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Profile("memory")
@@ -46,5 +46,14 @@ public class AnalysisSummaryPersistInMemory implements AnalysisSummaryPersistenc
     @Override
     public void deleteAnalysisSummary(String videoId) {
         commentsAnalyzeSummaryMap.remove(videoId);
+    }
+
+    @Override
+    public List<VideoCommentsSummary> getLatestVideoSummaries() {
+        return commentsAnalyzeSummaryMap.values().stream()
+                .filter(s -> s.getCreateDate() != null)
+                .sorted(Comparator.comparing(VideoCommentsSummary::getCreateDate).reversed())
+                .limit(6)
+                .collect(Collectors.toList());
     }
 }

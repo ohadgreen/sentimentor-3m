@@ -3,12 +3,11 @@ package com.acme.controllers;
 import com.acme.model.analysisreq.VideoCommentsRequest;
 import com.acme.model.comment.CommentSentimentSummary;
 import com.acme.model.comment.VideoCommentsSummary;
-import com.acme.model.comment.ConciseComment;
+import com.acme.model.comment.VideoSummaryDto;
 import com.acme.services.AnalysisSummaryService;
 import com.acme.services.RawCommentsService;
 import com.acme.services.SentimentHandlingService;
 import common.model.analysisrequest.SentimentAnalysisRequest;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +30,11 @@ public class SentimentAnalysisController {
     @GetMapping("/comments/{videoId}")
     public VideoCommentsSummary getCommentsAnalysisSummary(@PathVariable String videoId) {
         return analysisSummaryService.getCommentsAnalysisSummary(videoId);
+    }
+
+    @GetMapping("/latest")
+    public List<VideoSummaryDto> getLatestVideoSummaries() {
+        return analysisSummaryService.getLatestVideoSummaries();
     }
     @GetMapping("/sentimentOngoingAnalysis/{videoId}/{analysisId}")
     public CommentSentimentSummary getOnGoingSentimentAnalysisSummary(

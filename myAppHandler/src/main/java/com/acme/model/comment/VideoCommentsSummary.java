@@ -1,5 +1,7 @@
 package com.acme.model.comment;
 
+import com.acme.model.ytsearch.Thumbnails;
+import com.acme.model.ytsearch.VideoStatistics;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -19,6 +21,11 @@ public class VideoCommentsSummary implements Serializable, Persistable<String> {
     private int totalComments;
     private LinkedHashMap<String, Integer> wordsFrequency;
     private Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap = new HashMap<>();
+    private VideoStatistics statistics;
+    private Thumbnails thumbnails;
+    private String description;
+    private String channelTitle;
+    private String publishTime;
     @CreatedDate
     private LocalDateTime createDate;
     @LastModifiedDate
@@ -78,6 +85,46 @@ public class VideoCommentsSummary implements Serializable, Persistable<String> {
     }
     public void setSentimentAnalysisStatusMap(Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap) {
         this.sentimentAnalysisStatusMap = sentimentAnalysisStatusMap;
+    }
+
+    public VideoStatistics getStatistics() {
+        return statistics;
+    }
+
+    public void setStatistics(VideoStatistics statistics) {
+        this.statistics = statistics;
+    }
+
+    public Thumbnails getThumbnails() {
+        return thumbnails;
+    }
+
+    public void setThumbnails(Thumbnails thumbnails) {
+        this.thumbnails = thumbnails;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getChannelTitle() {
+        return channelTitle;
+    }
+
+    public void setChannelTitle(String channelTitle) {
+        this.channelTitle = channelTitle;
+    }
+
+    public String getPublishTime() {
+        return publishTime;
+    }
+
+    public void setPublishTime(String publishTime) {
+        this.publishTime = publishTime;
     }
 
     public LocalDateTime getCreateDate() {
