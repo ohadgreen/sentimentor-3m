@@ -2,6 +2,8 @@ server:
   port: 8082
 
 spring:
+  application:
+    name: aiWorker
   ai:
     openai:
       api-key: ${OPENAI_API_KEY}
@@ -17,4 +19,13 @@ jms:
     analysis-request: sentiment.analysis.request
     analysis-response: sentiment.analysis.response
   listener:
-    concurrency: 5
+    concurrency: 1-5
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}

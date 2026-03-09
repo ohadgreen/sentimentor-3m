@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: myAppHandler
   data:
     mongodb:
       uri: ${MONGODB_URI}
@@ -22,3 +24,12 @@ jms:
   queues:
     analysis-request: sentiment.analysis.request
     analysis-response: sentiment.analysis.response
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+  metrics:
+    tags:
+      application: ${spring.application.name}
