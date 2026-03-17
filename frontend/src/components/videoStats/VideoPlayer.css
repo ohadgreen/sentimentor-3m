@@ -1,0 +1,104 @@
+.video-player-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.video--stats {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center; /* Center stats horizontally */
+    gap: 30px; /* Add spacing between stats */
+    padding: 5px 0;
+}
+
+.video--stats > div {
+    font-size: small;
+}
+
+.video--title {
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.video--description {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Remove or restrict the global div selector to avoid affecting other layouts */
+/* div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+} */
+
+.video-player-outer-root {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.video-player-title-row {
+  width: 100%;
+  padding-left: 16px;
+  box-sizing: border-box;
+  margin-bottom: 4px;
+}
+
+.video--title {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 0;
+}
+
+.video-player-horizontal-root {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 240px;
+}
+
+.video-player-left, .video-player-right {
+  width: 50%;
+  box-sizing: border-box;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.video-player-left {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.video-player-right {
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.video--description {
+  margin-bottom: 8px;
+}
+
+.video--stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.video--stats > div {
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.video--stats img {
+  margin-right: 6px;
+}
