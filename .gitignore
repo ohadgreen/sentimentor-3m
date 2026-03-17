@@ -38,6 +38,9 @@ build/
 frontend/node/
 frontend/node_modules/
 
+### Secrets ###
+.env
+
 ### Mac OS ###
 .DS_Store
 /.idea/copilot.data.migration.ask2agent.xml
