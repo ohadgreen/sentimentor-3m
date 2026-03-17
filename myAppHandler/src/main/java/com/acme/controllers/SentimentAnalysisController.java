@@ -27,11 +27,6 @@ public class SentimentAnalysisController {
         this.sentimentHandlingService = sentimentHandlingService;
     }
 
-    @GetMapping("/comments/{videoId}")
-    public VideoCommentsSummary getCommentsAnalysisSummary(@PathVariable String videoId) {
-        return analysisSummaryService.getCommentsAnalysisSummary(videoId);
-    }
-
     @GetMapping("/latest")
     public List<VideoSummaryDto> getLatestVideoSummaries() {
         return analysisSummaryService.getLatestVideoSummaries();
