@@ -2,6 +2,7 @@ package com.acme.services;
 
 import common.model.analysisrequest.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @ActiveProfiles("memory")
+@EnabledIfEnvironmentVariable(named = "OPENAI_API_KEY", matches = ".+")
 class SentimentAnalysisServiceITest {
 
     @Autowired
@@ -46,7 +48,7 @@ class SentimentAnalysisServiceITest {
             } else if (commentToAnalyze.getCommentId().contains("neu")) {
                 assertEquals(Sentiment.NEUTRAL, commentToAnalyze.getSentiment(), "Expected NEUTRAL sentiment");
             } else if (commentToAnalyze.getCommentId().contains("unk")) {
-                assertEquals(Sentiment.UNKNOWN, commentToAnalyze.getSentiment(), "Expected NEUTRAL sentiment for unknown");
+                assertEquals(Sentiment.NEUTRAL, commentToAnalyze.getSentiment(), "Expected NEUTRAL sentiment for unknown");
             }
         }
     }

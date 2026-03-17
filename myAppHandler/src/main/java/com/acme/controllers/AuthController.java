@@ -10,9 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
+    record GoogleLoginRequest(String idToken) {}
+
 
     private final GoogleTokenVerifier googleTokenVerifier;
     private final JwtService jwtService;
@@ -27,8 +31,8 @@ public class AuthController {
     }
 
     @PostMapping("/google")
-    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> body) {
-        String idToken = body.get("idToken");
+    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest body) {
+        String idToken = body.idToken();
         if (idToken == null || idToken.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "idToken is required"));
         }

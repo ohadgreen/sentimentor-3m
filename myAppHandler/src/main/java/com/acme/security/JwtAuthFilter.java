@@ -30,7 +30,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             Claims claims = jwtService.validateToken(token);
-            if (claims != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (claims == null) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"Invalid or expired token\"}");
+                return;
+            }
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 String email = claims.getSubject();
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());

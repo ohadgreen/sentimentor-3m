@@ -7,7 +7,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Profile("db")
@@ -36,7 +38,7 @@ public class AnalysisSummaryPersistInMongo implements AnalysisSummaryPersistence
 
     @Override
     public VideoCommentsSummary getCommentsAnalysisSummary(String videoId) {
-        return analysisSummaryRepository.findByVideoId(videoId);
+        return sortWordsFrequency(analysisSummaryRepository.findByVideoId(videoId));
     }
 
     @Override
@@ -57,6 +59,19 @@ public class AnalysisSummaryPersistInMongo implements AnalysisSummaryPersistence
 
     @Override
     public List<VideoCommentsSummary> getLatestVideoSummaries() {
-        return analysisSummaryRepository.findTop6ByOrderByCreateDateDesc();
+        return analysisSummaryRepository.findTop6ByOrderByCreateDateDesc().stream()
+                .map(this::sortWordsFrequency)
+                .toList();
+    }
+
+    private VideoCommentsSummary sortWordsFrequency(VideoCommentsSummary summary) {
+        if (summary == null || summary.getWordsFrequency() == null) {
+            return summary;
+        }
+        LinkedHashMap<String, Integer> sorted = summary.getWordsFrequency().entrySet().stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), LinkedHashMap::putAll);
+        summary.setWordsFrequency(sorted);
+        return summary;
     }
 }
