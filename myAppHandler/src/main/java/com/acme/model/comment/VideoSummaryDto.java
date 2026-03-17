@@ -1,5 +1,7 @@
 package com.acme.model.comment;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -8,6 +10,7 @@ public class VideoSummaryDto {
     private String videoId;
     private String videoTitle;
     private String description;
+    @JsonSerialize(using = WordsFrequencySerializer.class)
     private LinkedHashMap<String, Integer> wordsFrequency;
     private String viewCount;
     private String likeCount;

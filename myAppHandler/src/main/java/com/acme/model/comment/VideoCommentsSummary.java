@@ -2,6 +2,7 @@ package com.acme.model.comment;
 
 import com.acme.model.ytsearch.Thumbnails;
 import com.acme.model.ytsearch.VideoStatistics;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -19,6 +20,7 @@ public class VideoCommentsSummary implements Serializable, Persistable<String> {
     private String videoTitle;
     private String jobId;
     private int totalComments;
+    @JsonSerialize(using = WordsFrequencySerializer.class)
     private LinkedHashMap<String, Integer> wordsFrequency;
     private Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap = new HashMap<>();
     private VideoStatistics statistics;

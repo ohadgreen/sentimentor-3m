@@ -31,6 +31,7 @@ public class SentimentAnalysisController {
     public List<VideoSummaryDto> getLatestVideoSummaries() {
         return analysisSummaryService.getLatestVideoSummaries();
     }
+
     @GetMapping("/sentimentOngoingAnalysis/{videoId}/{analysisId}")
     public CommentSentimentSummary getOnGoingSentimentAnalysisSummary(
             @PathVariable String videoId,
