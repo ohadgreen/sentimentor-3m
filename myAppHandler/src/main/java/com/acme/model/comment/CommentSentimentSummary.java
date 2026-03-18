@@ -18,6 +18,8 @@ public class CommentSentimentSummary {
     private int positiveComments;
     private int negativeComments;
     private int neutralComments;
+    private int totalInputTokens;
+    private int totalOutputTokens;
 
     public CommentSentimentSummary(String videoId, UUID analysisId, String videoTitle, String sentimentObject, String moreInfo) {
         this.videoId = videoId;
@@ -142,5 +144,21 @@ public class CommentSentimentSummary {
     }
     public void setNeutralComments(int neutralComments) {
         this.neutralComments = neutralComments;
+    }
+
+    public int getTotalInputTokens() {
+        return totalInputTokens;
+    }
+
+    public void setTotalInputTokens(int totalInputTokens) {
+        this.totalInputTokens = totalInputTokens;
+    }
+
+    public int getTotalOutputTokens() {
+        return totalOutputTokens;
+    }
+
+    public void setTotalOutputTokens(int totalOutputTokens) {
+        this.totalOutputTokens = totalOutputTokens;
     }
 }

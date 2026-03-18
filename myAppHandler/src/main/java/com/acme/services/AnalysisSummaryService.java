@@ -61,7 +61,9 @@ public class AnalysisSummaryService {
                                 s.getPositiveComments(),
                                 s.getNegativeComments(),
                                 s.getNeutralComments(),
-                                s.getTotalCommentsAnalyzed()))
+                                s.getTotalCommentsAnalyzed(),
+                                s.getTotalInputTokens(),
+                                s.getTotalOutputTokens()))
                         .collect(Collectors.toList());
         dto.setSentimentAnalyses(sentimentAnalyses);
 

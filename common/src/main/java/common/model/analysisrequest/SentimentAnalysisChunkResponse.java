@@ -8,13 +8,17 @@ public class SentimentAnalysisChunkResponse {
     private UUID analysisId;
     private UUID analysisChunkId;
     private List<CommentToAnalyze> commentSentiments;
+    private int inputTokens;
+    private int outputTokens;
 
     public SentimentAnalysisChunkResponse() {}
 
-    public SentimentAnalysisChunkResponse(UUID sentimentAnalysisId, UUID analysisChunkId, List<CommentToAnalyze> commentSentiments) {
+    public SentimentAnalysisChunkResponse(UUID sentimentAnalysisId, UUID analysisChunkId, List<CommentToAnalyze> commentSentiments, int inputTokens, int outputTokens) {
         this.analysisId = sentimentAnalysisId;
         this.analysisChunkId = analysisChunkId;
         this.commentSentiments = commentSentiments;
+        this.inputTokens = inputTokens;
+        this.outputTokens = outputTokens;
     }
 
     public UUID getAnalysisId() {
@@ -37,5 +41,21 @@ public class SentimentAnalysisChunkResponse {
 
     public void setCommentSentiments(List<CommentToAnalyze> commentSentiments) {
         this.commentSentiments = commentSentiments;
+    }
+
+    public int getInputTokens() {
+        return inputTokens;
+    }
+
+    public void setInputTokens(int inputTokens) {
+        this.inputTokens = inputTokens;
+    }
+
+    public int getOutputTokens() {
+        return outputTokens;
+    }
+
+    public void setOutputTokens(int outputTokens) {
+        this.outputTokens = outputTokens;
     }
 }

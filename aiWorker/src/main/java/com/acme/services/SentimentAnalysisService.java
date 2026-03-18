@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.metadata.Usage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,6 +81,9 @@ public class SentimentAnalysisService {
         logger.debug("prompt: {}", prompt.toString());
 
         ChatResponse response = chatModel.call(prompt);
+        Usage usage = response.getMetadata().getUsage();
+        int inputTokens = usage != null ? usage.getPromptTokens().intValue() : 0;
+        int outputTokens = usage != null ? usage.getGenerationTokens().intValue() : 0;
         String commentAnalysisListString = response.getResult().getOutput().getContent();
 
         ObjectMapper mapper = new ObjectMapper();
@@ -102,7 +106,9 @@ public class SentimentAnalysisService {
             return new SentimentAnalysisChunkResponse(
                     analysisChunkRequest.getAnalysisId(),
                     analysisChunkRequest.getAnalysisChunkId(),
-                    commentsToAnalyze
+                    commentsToAnalyze,
+                    inputTokens,
+                    outputTokens
                     );
 
         } catch (JsonProcessingException e) {

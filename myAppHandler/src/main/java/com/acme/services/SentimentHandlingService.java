@@ -200,6 +200,11 @@ public class SentimentHandlingService {
         int newTotalAnalyzed = currentTotalAnalyzed + commentSentimentResults.size();
         commentSentimentSummary.setTotalCommentsAnalyzed(newTotalAnalyzed);
 
+        commentSentimentSummary.setTotalInputTokens(
+                commentSentimentSummary.getTotalInputTokens() + chunkAnalysisResponse.getInputTokens());
+        commentSentimentSummary.setTotalOutputTokens(
+                commentSentimentSummary.getTotalOutputTokens() + chunkAnalysisResponse.getOutputTokens());
+
         int totalCommentsToAnalyze = commentSentimentSummary.getTotalCommentsToAnalyze();
 
         logger.info("@@@ Chunk analysis internal. Chunk ID: {}. Comments in chunk: {}. Total analyzed so far: {}/{}",
