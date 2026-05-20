@@ -40,6 +40,14 @@ springdoc:
   api-docs:
     enabled: ${SWAGGER_ENABLED:true}
 
+rate-limit:
+  analyze:
+    requests-per-minute: 4
+  comments:
+    requests-per-minute: 10
+  trend:
+    requests-per-minute: 2
+
 management:
   endpoints:
     web:

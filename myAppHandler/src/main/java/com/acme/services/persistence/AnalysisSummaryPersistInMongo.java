@@ -1,10 +1,12 @@
 package com.acme.services.persistence;
 
+import com.acme.model.comment.SourceMode;
 import com.acme.model.comment.VideoCommentsSummary;
 import com.acme.repositories.AnalysisSummaryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashMap;
@@ -53,13 +55,25 @@ public class AnalysisSummaryPersistInMongo implements AnalysisSummaryPersistence
     }
 
     @Override
+    public void markAsTrend(String videoId) {
+        VideoCommentsSummary summary = analysisSummaryRepository.findByVideoId(videoId);
+        if (summary != null) {
+            summary.setSourceMode(SourceMode.TREND);
+            analysisSummaryRepository.save(summary);
+        }
+    }
+
+    @Override
     public void deleteAnalysisSummary(String videoId) {
         analysisSummaryRepository.deleteByVideoId(videoId);
     }
 
     @Override
     public List<VideoCommentsSummary> getLatestVideoSummaries() {
-        return analysisSummaryRepository.findTop6ByOrderByCreateDateDesc().stream()
+        return analysisSummaryRepository
+                .findTop6AdHocOrderByCreateDateDesc(Sort.by(Sort.Direction.DESC, "createDate"))
+                .stream()
+                .limit(6)
                 .map(this::sortWordsFrequency)
                 .toList();
     }

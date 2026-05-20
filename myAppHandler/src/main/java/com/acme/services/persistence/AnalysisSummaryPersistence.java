@@ -8,6 +8,7 @@ public interface AnalysisSummaryPersistence {
     void saveAnalysisSummary(VideoCommentsSummary videoCommentsSummary);
     VideoCommentsSummary getCommentsAnalysisSummary(String videoId);
     void updateAnalysisSummary(String videoId, VideoCommentsSummary videoCommentsSummary);
+    void markAsTrend(String videoId);
     void deleteAnalysisSummary(String videoId);
     List<VideoCommentsSummary> getLatestVideoSummaries();
 }

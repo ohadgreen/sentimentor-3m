@@ -23,6 +23,7 @@ public class VideoCommentsSummary implements Serializable, Persistable<String> {
     @JsonSerialize(using = WordsFrequencySerializer.class)
     private LinkedHashMap<String, Integer> wordsFrequency;
     private Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap = new HashMap<>();
+    private SourceMode sourceMode = SourceMode.AD_HOC;
     private VideoStatistics statistics;
     private Thumbnails thumbnails;
     private String description;
@@ -87,6 +88,13 @@ public class VideoCommentsSummary implements Serializable, Persistable<String> {
     }
     public void setSentimentAnalysisStatusMap(Map<UUID, CommentSentimentSummary> sentimentAnalysisStatusMap) {
         this.sentimentAnalysisStatusMap = sentimentAnalysisStatusMap;
+    }
+
+    public SourceMode getSourceMode() {
+        return sourceMode;
+    }
+    public void setSourceMode(SourceMode sourceMode) {
+        this.sourceMode = sourceMode;
     }
 
     public VideoStatistics getStatistics() {

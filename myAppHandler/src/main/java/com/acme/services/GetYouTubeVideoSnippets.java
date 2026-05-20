@@ -43,18 +43,18 @@ public class GetYouTubeVideoSnippets {
     private String videosBaseUrl;
 
     public VideoSearchResult searchVideos(String searchTerm, String pageToken) {
-        String publishedAfter = ISO_FORMATTER.format(Instant.now().minusSeconds(PUBLISHED_AFTER_DAYS * 24L * 60 * 60));
-        String searchUri = searchBaseUrl
-                + "?key=" + apiKey
-                + "&part=snippet"
-                + "&type=video"
-                + "&maxResults=" + MAX_RESULTS
-                + "&q=" + encodeSearchTerm(searchTerm)
-                + "&publishedAfter=" + publishedAfter
-                + "&order=viewCount"
-                + (pageToken != null && !pageToken.isBlank() ? "&pageToken=" + pageToken : "");
+        Instant publishedAfter = Instant.now().minusSeconds(PUBLISHED_AFTER_DAYS * 24L * 60 * 60);
+        return searchVideos(searchTerm, pageToken, publishedAfter, null);
+    }
 
-        logger.info("Searching YouTube videos: term={}, publishedAfter={}", searchTerm, publishedAfter);
+    public VideoSearchResult searchVideos(String searchTerm, String pageToken,
+                                          Instant publishedAfter, Instant publishedBefore) {
+        String searchUri = buildSearchUri(searchTerm, pageToken,
+                ISO_FORMATTER.format(publishedAfter),
+                publishedBefore != null ? ISO_FORMATTER.format(publishedBefore) : null);
+
+        logger.info("Searching YouTube videos: term={}, publishedAfter={}, publishedBefore={}",
+                searchTerm, publishedAfter, publishedBefore);
 
         try {
             URL url = new URI(searchUri).toURL();
@@ -78,6 +78,25 @@ public class GetYouTubeVideoSnippets {
             logger.error("Error searching YouTube videos for term: {}", searchTerm, e);
             return null;
         }
+    }
+
+    private String buildSearchUri(String searchTerm, String pageToken,
+                                  String publishedAfter, String publishedBefore) {
+        StringBuilder uri = new StringBuilder(searchBaseUrl)
+                .append("?key=").append(apiKey)
+                .append("&part=snippet")
+                .append("&type=video")
+                .append("&maxResults=").append(MAX_RESULTS)
+                .append("&q=").append(encodeSearchTerm(searchTerm))
+                .append("&publishedAfter=").append(publishedAfter)
+                .append("&order=viewCount");
+        if (publishedBefore != null && !publishedBefore.isBlank()) {
+            uri.append("&publishedBefore=").append(publishedBefore);
+        }
+        if (pageToken != null && !pageToken.isBlank()) {
+            uri.append("&pageToken=").append(pageToken);
+        }
+        return uri.toString();
     }
 
     private void enrichWithStatistics(VideoSearchResult result, ObjectMapper objectMapper) {

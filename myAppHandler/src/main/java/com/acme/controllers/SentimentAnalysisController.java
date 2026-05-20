@@ -8,6 +8,7 @@ import com.acme.services.AnalysisSummaryService;
 import com.acme.services.RawCommentsService;
 import com.acme.services.SentimentHandlingService;
 import common.model.analysisrequest.SentimentAnalysisRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,12 @@ public class SentimentAnalysisController {
     @GetMapping("/latest")
     public List<VideoSummaryDto> getLatestVideoSummaries() {
         return analysisSummaryService.getLatestVideoSummaries();
+    }
+
+    @GetMapping("/summary/{videoId}")
+    public ResponseEntity<VideoCommentsSummary> getVideoCommentsSummary(@PathVariable String videoId) {
+        VideoCommentsSummary summary = analysisSummaryService.getCommentsAnalysisSummary(videoId);
+        return summary != null ? ResponseEntity.ok(summary) : ResponseEntity.notFound().build();
     }
 
     @GetMapping("/sentimentOngoingAnalysis/{videoId}/{analysisId}")

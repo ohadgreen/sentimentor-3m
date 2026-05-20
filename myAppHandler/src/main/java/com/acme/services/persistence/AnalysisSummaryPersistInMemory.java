@@ -1,5 +1,6 @@
 package com.acme.services.persistence;
 
+import com.acme.model.comment.SourceMode;
 import com.acme.model.comment.VideoCommentsSummary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,14 @@ public class AnalysisSummaryPersistInMemory implements AnalysisSummaryPersistenc
     }
 
     @Override
+    public void markAsTrend(String videoId) {
+        VideoCommentsSummary summary = commentsAnalyzeSummaryMap.get(videoId);
+        if (summary != null) {
+            summary.setSourceMode(SourceMode.TREND);
+        }
+    }
+
+    @Override
     public void deleteAnalysisSummary(String videoId) {
         commentsAnalyzeSummaryMap.remove(videoId);
     }
@@ -52,6 +61,7 @@ public class AnalysisSummaryPersistInMemory implements AnalysisSummaryPersistenc
     public List<VideoCommentsSummary> getLatestVideoSummaries() {
         return commentsAnalyzeSummaryMap.values().stream()
                 .filter(s -> s.getCreateDate() != null)
+                .filter(s -> s.getSourceMode() == null || s.getSourceMode() == SourceMode.AD_HOC)
                 .sorted(Comparator.comparing(VideoCommentsSummary::getCreateDate).reversed())
                 .limit(6)
                 .collect(Collectors.toList());

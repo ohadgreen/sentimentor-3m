@@ -22,12 +22,16 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final String ANALYZE_PATH = "/api/sentiment/analyzeRequest";
     private static final String COMMENTS_PATH = "/api/sentiment/getRawVideoComments";
+    private static final String TREND_PATH = "/api/trend/start";
 
     @Value("${rate-limit.analyze.requests-per-minute:4}")
     private int analyzeRequestsPerMinute;
 
     @Value("${rate-limit.comments.requests-per-minute:10}")
     private int commentsRequestsPerMinute;
+
+    @Value("${rate-limit.trend.requests-per-minute:2}")
+    private int trendRequestsPerMinute;
 
     // key: "email:endpoint" -> Bucket
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
@@ -38,7 +42,7 @@ public class RateLimitFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String path = request.getRequestURI();
 
-        if (!path.equals(ANALYZE_PATH) && !path.equals(COMMENTS_PATH)) {
+        if (!path.equals(ANALYZE_PATH) && !path.equals(COMMENTS_PATH) && !path.equals(TREND_PATH)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -62,7 +66,14 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private Bucket createBucket(String path) {
-        int limit = path.equals(ANALYZE_PATH) ? analyzeRequestsPerMinute : commentsRequestsPerMinute;
+        int limit;
+        if (path.equals(ANALYZE_PATH)) {
+            limit = analyzeRequestsPerMinute;
+        } else if (path.equals(TREND_PATH)) {
+            limit = trendRequestsPerMinute;
+        } else {
+            limit = commentsRequestsPerMinute;
+        }
         return Bucket.builder()
                 .addLimit(Bandwidth.builder()
                         .capacity(limit)
