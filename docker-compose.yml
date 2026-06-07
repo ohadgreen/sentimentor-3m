@@ -12,7 +12,7 @@ services:
   activemq:
     image: apache/activemq-classic
     ports:
-      - "61616:61616"
+      - "61715:61616"
       - "8161:8161"
       - "1099:1099"
     volumes:

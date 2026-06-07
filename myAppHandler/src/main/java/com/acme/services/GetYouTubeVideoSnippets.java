@@ -1,5 +1,6 @@
 package com.acme.services;
 
+import com.acme.exceptions.YouTubeQuotaExceededException;
 import com.acme.model.ytsearch.VideoDetailsItem;
 import com.acme.model.ytsearch.VideoDetailsResult;
 import com.acme.model.ytsearch.VideoSearchResult;
@@ -63,6 +64,10 @@ public class GetYouTubeVideoSnippets {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
+            if (connection.getResponseCode() == 403) {
+                throw new YouTubeQuotaExceededException();
+            }
+
             ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
@@ -89,6 +94,7 @@ public class GetYouTubeVideoSnippets {
                 .append("&maxResults=").append(MAX_RESULTS)
                 .append("&q=").append(encodeSearchTerm(searchTerm))
                 .append("&publishedAfter=").append(publishedAfter)
+                .append("&relevanceLanguage=en")
                 .append("&order=viewCount");
         if (publishedBefore != null && !publishedBefore.isBlank()) {
             uri.append("&publishedBefore=").append(publishedBefore);

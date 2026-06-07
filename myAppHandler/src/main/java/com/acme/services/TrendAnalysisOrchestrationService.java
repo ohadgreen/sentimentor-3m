@@ -8,6 +8,8 @@ import com.acme.model.trend.DailyTrendResult;
 import com.acme.model.trend.TrendAnalysisJob;
 import com.acme.model.trend.TrendAnalysisRequest;
 import com.acme.model.trend.TrendJobStatus;
+import com.acme.model.trend.VideoCardInfo;
+import com.acme.model.ytsearch.VideoThumbnail;
 import com.acme.model.ytsearch.VideoSearchItem;
 import com.acme.model.ytsearch.VideoSearchResult;
 import com.acme.repositories.TrendAnalysisJobRepository;
@@ -79,13 +81,13 @@ public class TrendAnalysisOrchestrationService {
         }
 
         job.setJobStatus(TrendJobStatus.IN_PROGRESS);
-        job.setTotalDays(job.getDaysBack() - 1);
+        job.setTotalDays(job.getDaysBack());
         trendJobRepository.save(job);
 
         try {
             LocalDate today = LocalDate.now(ZoneOffset.UTC);
 
-            for (int i = job.getDaysBack() - 1; i >= 1; i--) {
+            for (int i = job.getDaysBack(); i >= 1; i--) {
                 LocalDate day = today.minusDays(i);
                 Instant dayStart = day.atStartOfDay(ZoneOffset.UTC).toInstant();
                 Instant dayEnd = day.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
@@ -129,11 +131,16 @@ public class TrendAnalysisOrchestrationService {
                 .limit(job.getVideosPerDay())
                 .toList();
 
+        boolean firstVideoSet = false;
         for (VideoSearchItem video : videos) {
             String videoId = video.getId() != null ? video.getId().getVideoId() : null;
             if (videoId == null) continue;
 
             videoIds.add(videoId);
+            if (!firstVideoSet) {
+                dayResult.setFirstVideo(buildVideoCardInfo(video));
+                firstVideoSet = true;
+            }
             try {
                 processVideoForDay(job, videoId, dayResult);
             } catch (Exception e) {
@@ -205,6 +212,27 @@ public class TrendAnalysisOrchestrationService {
 
         logger.warn("Timed out waiting for analysis {} on video {}", analysisId, videoId);
         return null;
+    }
+
+    private VideoCardInfo buildVideoCardInfo(VideoSearchItem video) {
+        VideoCardInfo info = new VideoCardInfo();
+        if (video.getId() != null) {
+            info.setVideoId(video.getId().getVideoId());
+        }
+        if (video.getSnippet() != null) {
+            info.setTitle(video.getSnippet().getTitle());
+            if (video.getSnippet().getThumbnails() != null) {
+                VideoThumbnail thumb = video.getSnippet().getThumbnails().getMedium();
+                if (thumb == null) thumb = video.getSnippet().getThumbnails().getDefaultThumbnail();
+                if (thumb != null) info.setThumbnailUrl(thumb.getUrl());
+            }
+        }
+        if (video.getStatistics() != null) {
+            info.setViewCount(video.getStatistics().getViewCount());
+            info.setLikeCount(video.getStatistics().getLikeCount());
+            info.setCommentCount(video.getStatistics().getCommentCount());
+        }
+        return info;
     }
 
     private boolean hasEnoughComments(VideoSearchItem video, int minComments) {

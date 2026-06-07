@@ -10,7 +10,7 @@ spring:
       chat:
         model: ${OPENAI_CHAT_MODEL:gpt-5-nano}
   activemq:
-    broker-url: ${ACTIVEMQ_BROKER_URL:tcp://localhost:61616}
+    broker-url: ${ACTIVEMQ_BROKER_URL:tcp://localhost:61715}
     user: ${ACTIVEMQ_USER:admin}
     password: ${ACTIVEMQ_PASSWORD:admin}
 

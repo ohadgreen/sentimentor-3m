@@ -10,6 +10,7 @@ public class DailyTrendResult {
     private int totalCommentsAnalyzed;
     private int videoCount;
     private List<String> videoIds;
+    private VideoCardInfo firstVideo;
 
     public DailyTrendResult() {
     }
@@ -72,5 +73,13 @@ public class DailyTrendResult {
 
     public void setVideoIds(List<String> videoIds) {
         this.videoIds = videoIds;
+    }
+
+    public VideoCardInfo getFirstVideo() {
+        return firstVideo;
+    }
+
+    public void setFirstVideo(VideoCardInfo firstVideo) {
+        this.firstVideo = firstVideo;
     }
 }
