@@ -25,6 +25,16 @@
     align-items: center;
 }
 
+.search--error {
+    padding: 20px;
+    text-align: center;
+    color: #c0392b;
+    background: #fdecea;
+    border-radius: 8px;
+    margin: 16px 0;
+    font-size: 0.95em;
+}
+
 .search-results--loading-more {
     text-align: center;
     padding: 12px;

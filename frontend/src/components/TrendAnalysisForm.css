@@ -1,0 +1,98 @@
+.trend-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.trend-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trend-form__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #555;
+}
+
+.trend-form__input {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.trend-form__input::placeholder {
+  color: #aaa;
+}
+
+.trend-form__input:hover {
+  border-color: #bbb;
+}
+
+.trend-form__input:focus {
+  outline: none;
+  border-color: #36a2eb;
+  box-shadow: 0 0 0 2px rgba(54, 162, 235, 0.2);
+}
+
+.trend-form__input--number {
+  width: 100%;
+}
+
+.trend-form__row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+}
+
+.trend-form__row .trend-form__field {
+  flex: 1;
+}
+
+.trend-form__error {
+  font-size: 13px;
+  color: #e03e3e;
+  background: #fff0f0;
+  border: 1px solid #f5c6c6;
+  border-radius: 4px;
+  padding: 8px 12px;
+}
+
+.trend-form__submit {
+  background-color: #36a2eb;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 11px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+  align-self: flex-end;
+  min-width: 140px;
+}
+
+.trend-form__submit:hover:not(:disabled) {
+  background-color: #2a8dd4;
+  transform: translateY(-1px);
+}
+
+.trend-form__submit:active:not(:disabled) {
+  background-color: #1f6fa8;
+  transform: translateY(0);
+}
+
+.trend-form__submit:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}

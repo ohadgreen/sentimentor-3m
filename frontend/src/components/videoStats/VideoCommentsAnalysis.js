@@ -44,6 +44,7 @@ const VideoCommentsAnalysis = (props) => {
     const [loadingMore, setLoadingMore] = useState(false);
     const [sentimentFilter, setSentimentFilter] = useState(null); // 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE' | null
     const [sentimentObject, setSentimentObject] = useState(null); // The word analyzed (e.g. "love") - required for sentiment filter
+    const [analysisStarted, setAnalysisStarted] = useState(false);
     
     const PAGE_SIZE = 20; // Constant page size
 
@@ -65,6 +66,7 @@ const VideoCommentsAnalysis = (props) => {
                 setHasMorePages(true);
                 setSentimentFilter(null);
                 setSentimentObject(null);
+                setAnalysisStarted(false);
                 
                 const payload = {
                     userId: auth.user?.sub || auth.user?.email || "anonymous",
@@ -251,7 +253,37 @@ const VideoCommentsAnalysis = (props) => {
         };
     }, [hasMorePages, loadingMore, commentsLoading, loadMoreComments]);
 
-    if (loading) return <div>Loading...</div>;
+    // Build player details from fetch response (getRawVideoComments); fallback to search result or minimal when loading
+    const playerDetails = initialCommentsSummary?.videoId != null
+        ? {
+            id: initialCommentsSummary.videoId,
+            snippet: {
+                title: initialCommentsSummary.videoTitle ?? "Loading...",
+                description: initialCommentsSummary.description ?? ""
+            },
+            statistics: initialCommentsSummary.statistics ?? {}
+        }
+        : (videoId && selectedVideoFromSearch
+            ? {
+                id: videoId,
+                snippet: selectedVideoFromSearch.snippet ?? { title: "Loading...", description: "" },
+                statistics: selectedVideoFromSearch.statistics ?? {}
+              }
+            : videoId
+                ? { id: videoId, snippet: { title: "Loading...", description: "" }, statistics: {} }
+                : null);
+
+    if (loading) return (
+        <div className="video-comments-analysis-root layout-5col">
+            <div className="video-player-cell">
+                {playerDetails && <VideoPlayer videoDetails={playerDetails} />}
+            </div>
+            <div className="comments-col"><div>Loading...</div></div>
+            <div className="words-frequency-col"><div>Loading...</div></div>
+            <div className="sentiment-analysis-col"><div>Loading...</div></div>
+        </div>
+    );
+
     if (!initialCommentsSummary || !initialCommentsSummary.wordsFrequency) return <div>No data found</div>;
 
     // Prepare chart data
@@ -344,25 +376,7 @@ const VideoCommentsAnalysis = (props) => {
         }));
     })();
 
-    // Build player details from fetch response (getRawVideoComments); fallback to search result or minimal when loading
-    const playerDetails = initialCommentsSummary?.videoId != null
-        ? {
-            id: initialCommentsSummary.videoId,
-            snippet: {
-                title: initialCommentsSummary.videoTitle ?? "Loading...",
-                description: initialCommentsSummary.description ?? ""
-            },
-            statistics: initialCommentsSummary.statistics ?? {}
-        }
-        : (videoId && selectedVideoFromSearch
-            ? {
-                id: videoId,
-                snippet: selectedVideoFromSearch.snippet ?? { title: "Loading...", description: "" },
-                statistics: selectedVideoFromSearch.statistics ?? {}
-              }
-            : videoId
-                ? { id: videoId, snippet: { title: "Loading...", description: "" }, statistics: {} }
-                : null);
+    const hasAnyAnalysis = !!existingSentimentAnalyses || analysisStarted;
 
     return (
         <div className="video-comments-analysis-root layout-5col">
@@ -426,7 +440,7 @@ const VideoCommentsAnalysis = (props) => {
                     ) : null}
                 </div>
             </div>
-            <div className="words-frequency-col">
+            <div className={`words-frequency-col${!hasAnyAnalysis ? ' expanded' : ''}`}>
                 <h3>Words Frequency</h3>
                 {selectedWord && (
                     <div className="filter-info">
@@ -443,12 +457,12 @@ const VideoCommentsAnalysis = (props) => {
                     <Bar data={chartData} options={chartOptions} />
                 </div>
             </div>
-            <div className="sentiment-analysis-col">
+            <div className={`sentiment-analysis-col${!hasAnyAnalysis ? ' no-results' : ''}`}>
                 <SentimentAnalysis
                     videoId={videoId}
                     words={words}
                     existingAnalyses={existingSentimentAnalyses}
-                    onAnalyzeClicked={(analyzedWord) => setSentimentObject(analyzedWord)}
+                    onAnalyzeClicked={(analyzedWord) => { setSentimentObject(analyzedWord); setAnalysisStarted(true); }}
                     onAnalysisCompleted={() => {
                         setSelectedWord(null);
                         setSentimentFilter(null);

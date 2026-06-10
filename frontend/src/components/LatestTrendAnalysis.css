@@ -1,0 +1,194 @@
+/* ── Latest Trend Analysis strip ── */
+
+.lta {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  gap: 8px;
+}
+
+.lta__header {
+  display: flex;
+  align-items: center;
+  padding-top: 10px;
+  flex-shrink: 0;
+}
+
+.lta__title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  padding-bottom: 4px;
+  border-bottom: 2px solid #36a2eb;
+}
+
+.lta__status {
+  font-size: 13px;
+  color: #888;
+  padding: 6px 0;
+}
+
+.lta__status--error {
+  color: #c62828;
+}
+
+/* Vertical scrollable list */
+.lta__scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #ddd transparent;
+}
+
+.lta__scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.lta__scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.lta__scroll::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 3px;
+}
+
+/* ── Card ── */
+.lta__card {
+  width: 100%;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lta__card--clickable {
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.lta__card--clickable:hover {
+  border-color: #36a2eb;
+  box-shadow: 0 4px 14px rgba(54, 162, 235, 0.18);
+  transform: translateY(-2px);
+}
+
+/* Card header */
+.lta__card-header {
+  padding: 10px 14px 8px 14px;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lta__card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.lta__card-query {
+  font-size: 13px;
+  font-weight: 600;
+  color: #222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.lta__card-arrow {
+  font-size: 14px;
+  color: #aaa;
+  flex-shrink: 0;
+}
+
+.lta__card-object {
+  font-size: 12px;
+  font-weight: 500;
+  color: #36a2eb;
+  background: rgba(54, 162, 235, 0.08);
+  border: 1px solid rgba(54, 162, 235, 0.2);
+  border-radius: 10px;
+  padding: 1px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+
+/* Stats row */
+.lta__card-stats {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lta__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.lta__stat-label {
+  font-size: 9px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #aaa;
+  line-height: 1;
+}
+
+.lta__stat-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1;
+}
+
+.lta__stat--pos .lta__stat-value {
+  color: #388e3c;
+}
+
+.lta__stat--neg .lta__stat-value {
+  color: #c62828;
+}
+
+/* Charts area */
+.lta__card-charts {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  height: 180px;
+  padding: 10px 12px 8px 12px;
+  gap: 12px;
+  box-sizing: border-box;
+}
+
+.lta__card-pie {
+  width: 140px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.lta__card-line {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}

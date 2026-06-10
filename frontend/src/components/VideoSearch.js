@@ -14,6 +14,7 @@ const VideoSearch = (props) => {
   });
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState(null);
   const sentinelRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const nextPageTokenRef = useRef("");
@@ -26,15 +27,28 @@ const VideoSearch = (props) => {
 
   useEffect(() => {
     setLoading(true);
+    setError(null);
     const params = new URLSearchParams({ q: searchTerm });
     const url = `${searchBaseUrl}?${params.toString()}`;
     apiFetch(url)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((body) => { throw body; });
+        }
+        return res.json();
+      })
       .then((searchResultsResponse) => {
         setSearchResults({
           nextPageToken: searchResultsResponse.nextPageToken ?? "",
           items: searchResultsResponse.items ?? [],
         });
+      })
+      .catch((err) => {
+        setError(
+          err?.error === "quota_exceeded"
+            ? "YouTube search quota reached for today. Please try again tomorrow."
+            : "Search failed. Please try again."
+        );
       })
       .finally(() => setLoading(false));
   }, [searchTerm]);
@@ -48,12 +62,24 @@ const VideoSearch = (props) => {
     });
     const url = `${searchBaseUrl}?${params.toString()}`;
     apiFetch(url)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then((body) => { throw body; });
+        }
+        return res.json();
+      })
       .then((searchResultsResponse) => {
         setSearchResults((prev) => ({
           nextPageToken: searchResultsResponse.nextPageToken ?? "",
           items: [...prev.items, ...(searchResultsResponse.items ?? [])],
         }));
+      })
+      .catch((err) => {
+        setError(
+          err?.error === "quota_exceeded"
+            ? "YouTube search quota reached for today. Please try again tomorrow."
+            : "Failed to load more results. Please try again."
+        );
       })
       .finally(() => setLoadingMore(false));
   }, [searchTerm]);
@@ -62,8 +88,13 @@ const VideoSearch = (props) => {
     const sentinel = sentinelRef.current;
     const scrollRoot = scrollContainerRef.current;
     if (!sentinel) return;
+    let initialFire = true;
     const observer = new IntersectionObserver(
       (entries) => {
+        if (initialFire) {
+          initialFire = false;
+          return;
+        }
         if (entries[0].isIntersecting && nextPageTokenRef.current && !loadingMoreRef.current) {
           loadMore();
         }
@@ -72,7 +103,7 @@ const VideoSearch = (props) => {
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMore, searchResults.nextPageToken]);
+  }, [loadMore]);
 
   const formatCount = (value) =>
     value != null && value !== ""
@@ -130,7 +161,9 @@ const VideoSearch = (props) => {
   return (
     <div className="search--results">
       <div ref={scrollContainerRef} className="search--results-scroll">
-        {loading && searchResults.items.length === 0 ? (
+        {error ? (
+          <div className="search--error">{error}</div>
+        ) : loading && searchResults.items.length === 0 ? (
           <div>Loading...</div>
         ) : (
           <>
