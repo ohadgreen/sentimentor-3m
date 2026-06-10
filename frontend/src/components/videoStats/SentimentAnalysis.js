@@ -135,7 +135,7 @@ const SentimentAnalysis = ({ videoId, words, existingAnalyses, onAnalyzeClicked,
     const fetchSentimentSummary = useCallback(async (vidId, aId) => {
         try {
             const summaryResponse = await apiFetch(
-                `http://localhost:8081/api/sentiment/sentimentOngoingAnalysis/${vidId}/${aId}`,
+                `/api/sentiment/sentimentOngoingAnalysis/${vidId}/${aId}`,
                 { method: "GET", headers: { "accept": "*/*" } }
             );
             if (!summaryResponse.ok) {
@@ -201,7 +201,7 @@ const SentimentAnalysis = ({ videoId, words, existingAnalyses, onAnalyzeClicked,
                 totalCommentsToAnalyze: numComments
             };
 
-            const response = await apiFetch("http://localhost:8081/api/sentiment/analyzeRequest", {
+            const response = await apiFetch("/api/sentiment/analyzeRequest", {
                 method: "POST",
                 headers: { "accept": "*/*", "Content-Type": "application/json" },
                 body: JSON.stringify(payload)

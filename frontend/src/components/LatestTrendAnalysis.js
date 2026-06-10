@@ -23,7 +23,7 @@ ChartJS.register(
   Legend
 );
 
-const API_URL = "http://localhost:8081/api/trend/latest";
+const API_URL = "/api/trend/latest";
 
 const PIE_OPTIONS = {
   responsive: true,

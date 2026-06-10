@@ -20,7 +20,7 @@ const VideoSearch = (props) => {
   const nextPageTokenRef = useRef("");
   const loadingMoreRef = useRef(false);
 
-  const searchBaseUrl = "http://localhost:8081/api/videos/search";
+  const searchBaseUrl = "/api/videos/search";
 
   nextPageTokenRef.current = searchResults.nextPageToken;
   loadingMoreRef.current = loadingMore;

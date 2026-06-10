@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./TrendAnalysisForm.css";
 import { apiFetch } from "../utils/api";
 
-const API_URL = "http://localhost:8081/api/trend/start";
+const API_URL = "/api/trend/start";
 
 const DEFAULT_FORM = {
   searchQuery: "",

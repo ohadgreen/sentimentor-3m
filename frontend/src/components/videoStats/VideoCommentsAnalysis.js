@@ -31,8 +31,8 @@ const VideoCommentsAnalysis = (props) => {
     const videoId = props.videoId;
     const selectedVideoFromSearch = props.selectedVideoFromSearch;
     const TOTAL_COMMENTS_REQUIRED = props.commentsCount ?? 500;
-    const commentsListReqUrl = "http://localhost:8081/api/sentiment/getRawVideoComments";
-    const commentsPageReqUrl = "http://localhost:8081/api/comments/page";
+    const commentsListReqUrl = "/api/sentiment/getRawVideoComments";
+    const commentsPageReqUrl = "/api/comments/page";
 
     const [initialCommentsSummary, setInitialCommentsSummary] = useState(null);
     const [loading, setLoading] = useState(true);

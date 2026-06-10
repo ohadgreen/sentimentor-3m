@@ -23,7 +23,7 @@ ChartJS.register(
   Legend
 );
 
-const API_BASE = "http://localhost:8081/api/trend";
+const API_BASE = "/api/trend";
 const POLL_INTERVAL_MS = 10000;
 
 const STATUS_LABELS = {

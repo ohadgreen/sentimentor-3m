@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import "./LatestAnalysis.css";
 import { apiFetch } from "../utils/api";
 
-const API_URL = "http://localhost:8081/api/sentiment/latest";
+const API_URL = "/api/sentiment/latest";
 
 const formatCount = (count) => {
   const num = typeof count === "string" ? parseInt(count, 10) : count;

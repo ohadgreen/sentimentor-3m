@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     const login = useCallback(async (googleCredential) => {
-        const res = await fetch("http://localhost:8081/api/auth/google", {
+        const res = await fetch("/api/auth/google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idToken: googleCredential }),
