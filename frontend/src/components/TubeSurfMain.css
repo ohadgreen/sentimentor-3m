@@ -219,3 +219,21 @@
     background-color: #f4f4f4;
     border-color: #bbb;
 }
+
+.search--comments-count-select {
+    padding: 10px 10px;
+    font-size: 14px;
+    color: #333;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.search--comments-count-select:focus {
+    outline: none;
+    border-color: #36A2EB;
+    box-shadow: 0 0 0 2px rgba(54, 162, 235, 0.2);
+}

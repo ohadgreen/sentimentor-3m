@@ -30,7 +30,7 @@ const VideoCommentsAnalysis = (props) => {
     const auth = useAuth();
     const videoId = props.videoId;
     const selectedVideoFromSearch = props.selectedVideoFromSearch;
-    const TOTAL_COMMENTS_REQUIRED = 500;
+    const TOTAL_COMMENTS_REQUIRED = props.commentsCount ?? 500;
     const commentsListReqUrl = "http://localhost:8081/api/sentiment/getRawVideoComments";
     const commentsPageReqUrl = "http://localhost:8081/api/comments/page";
 
@@ -46,7 +46,8 @@ const VideoCommentsAnalysis = (props) => {
     const [sentimentObject, setSentimentObject] = useState(null); // The word analyzed (e.g. "love") - required for sentiment filter
     const [analysisStarted, setAnalysisStarted] = useState(false);
     
-    const PAGE_SIZE = 20; // Constant page size
+    const SEARCH_RESULTS_PAGE_SIZE = 20; // Constant page size
+    const YOUTUBE_FETCH_COMMENTS_PER_PAGE = 50; 
 
     // Fetch summary data (wordsFrequency) - triggers commentsListReqUrl when videoId is set (e.g. search result selected)
     useEffect(() => {
@@ -73,7 +74,7 @@ const VideoCommentsAnalysis = (props) => {
                     jobId: "12345",
                     videoId: videoId,
                     totalCommentsRequired: TOTAL_COMMENTS_REQUIRED,
-                    commentsInPage: 50
+                    commentsInPage: YOUTUBE_FETCH_COMMENTS_PER_PAGE
                 };
 
                 const response = await apiFetch(commentsListReqUrl, {
@@ -181,7 +182,7 @@ const VideoCommentsAnalysis = (props) => {
         if (!loading && videoId) {
             setPageNumber(1);
             setHasMorePages(true);
-            fetchComments(1, PAGE_SIZE, selectedWord, sentimentObject, sentimentFilter, false);
+            fetchComments(1, SEARCH_RESULTS_PAGE_SIZE, selectedWord, sentimentObject, sentimentFilter, false);
         }
     }, [videoId, selectedWord, sentimentFilter, sentimentObject, loading, fetchComments]);
 
@@ -220,7 +221,7 @@ const VideoCommentsAnalysis = (props) => {
         if (!loadingMore && hasMorePages && !commentsLoading && !loading) {
             const nextPage = pageNumber + 1;
             setPageNumber(nextPage);
-            fetchComments(nextPage, PAGE_SIZE, selectedWord, sentimentObject, sentimentFilter, true);
+            fetchComments(nextPage, SEARCH_RESULTS_PAGE_SIZE, selectedWord, sentimentObject, sentimentFilter, true);
         }
     }, [loadingMore, hasMorePages, commentsLoading, loading, pageNumber, selectedWord, sentimentFilter, sentimentObject, fetchComments]);
 
@@ -396,7 +397,7 @@ const VideoCommentsAnalysis = (props) => {
                                 setFilteredComments([]);
                                 setPageNumber(1);
                                 setHasMorePages(true);
-                                fetchComments(1, PAGE_SIZE, null, null, null, false);
+                                fetchComments(1, SEARCH_RESULTS_PAGE_SIZE, null, null, null, false);
                             }}
                         >
                             Clear Filters
@@ -470,7 +471,7 @@ const VideoCommentsAnalysis = (props) => {
                         setFilteredComments([]);
                         setPageNumber(1);
                         setHasMorePages(true);
-                        fetchComments(1, PAGE_SIZE, null, null, null, false);
+                        fetchComments(1, SEARCH_RESULTS_PAGE_SIZE, null, null, null, false);
                     }}
                     onSentimentBarClick={(sentimentObj, sentiment) => {
                         const isSameFilter = sentimentObject === sentimentObj && sentimentFilter === sentiment;

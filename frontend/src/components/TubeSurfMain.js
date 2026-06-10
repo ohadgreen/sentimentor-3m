@@ -17,6 +17,7 @@ const TubeSurfMain = () => {
   const [showVideoDetails, setShowVideoDetails] = useState(false);
   const [trendJobId, setTrendJobId] = useState(null);
   const [trendParams, setTrendParams] = useState(null);
+  const [commentsCount, setCommentsCount] = useState(500);
 
   const videoSetter = (event, searchItem) => {
     event.stopPropagation();
@@ -59,7 +60,7 @@ const TubeSurfMain = () => {
             ← Back
           </button>
         </div>
-        <VideoDisplayWrapper videoId={videoIdToAnalyze} selectedVideoFromSearch={selectedVideoFromSearch} />
+        <VideoDisplayWrapper videoId={videoIdToAnalyze} selectedVideoFromSearch={selectedVideoFromSearch} commentsCount={commentsCount} />
       </div>
     );
   }
@@ -96,6 +97,15 @@ const TubeSurfMain = () => {
                 }
               }}
             />
+            <select
+              value={commentsCount}
+              onChange={(e) => setCommentsCount(Number(e.target.value))}
+              className="search--comments-count-select"
+            >
+              {[100, 500, 1000, 2000].map(n => (
+                <option key={n} value={n}>{n} comments</option>
+              ))}
+            </select>
             <button
               onClick={() => { setCommittedSearchTerm(searchTerm); setSearchVersion((v) => v + 1); setShowSearchList(true); }}
               disabled={searchTerm === ""}
