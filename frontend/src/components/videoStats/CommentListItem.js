@@ -41,7 +41,7 @@ const CommentListItem = ({ comment, highlightWord }) => {
         referrerPolicy="no-referrer"
         onError={(e) => {
           e.target.onerror = null;
-          e.target.src = `${process.env.PUBLIC_URL}/person-fallback.webp`;
+          e.target.src = "/person-fallback.webp";
         }}
       />
       <div className="comment--main">
@@ -70,7 +70,7 @@ const CommentListItem = ({ comment, highlightWord }) => {
         <div className="comment--meta">
           <div className="comment--likes">
             <img
-              src={`${process.env.PUBLIC_URL || ""}/like.png`}
+              src="/like.png"
               width={15}
               height={15}
               alt="likes"

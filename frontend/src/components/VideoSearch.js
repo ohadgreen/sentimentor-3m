@@ -139,15 +139,15 @@ const VideoSearch = (props) => {
                 <div className="video-sr--publish">{item.snippet?.channelTitle || ''} · {formatDateString(item.snippet?.publishTime)}</div>
                 <div className="video-sr--stats">
                   <div>
-                    <img src={`${process.env.PUBLIC_URL}/view.png`} width={15} height={15} alt="views" />
+                    <img src="/view.png" width={15} height={15} alt="views" />
                     {" "}{formatCount(stats?.viewCount)}
                   </div>
                   <div>
-                    <img src={`${process.env.PUBLIC_URL}/like.png`} width={15} height={15} alt="likes" />
+                    <img src="/like.png" width={15} height={15} alt="likes" />
                     {" "}{formatCount(stats?.likeCount)}
                   </div>
                   <div>
-                    <img src={`${process.env.PUBLIC_URL}/comment.png`} width={15} height={15} alt="comments" />
+                    <img src="/comment.png" width={15} height={15} alt="comments" />
                     {" "}{formatCount(stats?.commentCount)}
                   </div>
                 </div>
