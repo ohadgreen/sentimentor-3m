@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import YouTube, { YouTubeProps } from "react-youtube";
+import YouTube from "react-youtube";
 import "./VideoPlayer.css";
 
 const MAX_DESCRIPTION_LENGTH = 300;
