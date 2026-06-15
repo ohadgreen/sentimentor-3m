@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import YouTube, { YouTubeProps } from "react-youtube";
+import YouTube from "react-youtube";
 import "./VideoPlayer.css";
 
 const MAX_DESCRIPTION_LENGTH = 300;
@@ -66,7 +66,7 @@ const VideoPlayer = (props) => {
           <div className="video--stats">
             <div>
               <img
-                src={`${process.env.PUBLIC_URL}/view.png`}
+                src="/view.png"
                 width={15}
                 height={15}
                 alt="views"
@@ -75,7 +75,7 @@ const VideoPlayer = (props) => {
             </div>
             <div>
               <img
-                src={`${process.env.PUBLIC_URL}/like.png`}
+                src="/like.png"
                 width={15}
                 height={15}
                 alt="likes"
@@ -84,7 +84,7 @@ const VideoPlayer = (props) => {
             </div>
             <div>
               <img
-                src={`${process.env.PUBLIC_URL}/comment.png`}
+                src="/comment.png"
                 width={15}
                 height={15}
                 alt="comments"
