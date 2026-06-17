@@ -1,0 +1,126 @@
+@startuml Sentimentor Architecture
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FAFAFA
+skinparam ArrowColor #555555
+skinparam component {
+    BackgroundColor #DDEEFF
+    BorderColor #336699
+    FontColor #222222
+}
+skinparam database {
+    BackgroundColor #FFF3CD
+    BorderColor #CC9900
+}
+skinparam actor {
+    BackgroundColor #E8F5E9
+    BorderColor #388E3C
+}
+skinparam cloud {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+}
+skinparam queue {
+    BackgroundColor #FBE9E7
+    BorderColor #D84315
+}
+skinparam node {
+    BackgroundColor #E3F2FD
+    BorderColor #1565C0
+}
+
+actor User
+
+' ─────────────────────────────────────────
+' Frontend
+' ─────────────────────────────────────────
+node "Frontend — React SPA :3000" as FE {
+    component "VideoSearch" as VS
+    component "SentimentAnalysis" as SA
+    component "TrendAnalysisForm" as TAF
+    component "TrendAnalysisResult" as TAR
+    component "TubeSurfMain (Router)" as TSM
+
+    TSM --> VS
+    TSM --> SA
+    TSM --> TAF
+    TSM --> TAR
+}
+
+' ─────────────────────────────────────────
+' Backend — myAppHandler
+' ─────────────────────────────────────────
+node "myAppHandler :8081" as BK {
+    component "SentimentAnalysisController\n/api/sentiment/*" as SAC
+    component "TrendAnalysisController\n/api/trend/*" as TAC
+    component "CommentsController\n/api/comments/*" as CC
+    component "AuthController\n/api/auth/*" as AC
+    component "VideoSearchController" as VSC
+
+    component "SentimentHandlingService\n(chunks + tracks analysis)" as SHS
+    component "TrendAnalysisOrchestrationService\n(@Async, per-day loop)" as TAO
+    component "RawCommentsService" as RCS
+
+    database "MongoDB Repositories" as REPO {
+        component "ConciseComments" as MCOL1
+        component "VideoCommentsSummary" as MCOL2
+        component "CommentSentiments" as MCOL3
+        component "TrendAnalysisJobs" as MCOL4
+    }
+
+    SAC --> SHS
+    SAC --> RCS
+    CC  --> RCS
+    TAC --> TAO
+    TAO --> RCS
+    TAO --> SHS
+    SHS --> REPO
+    RCS --> REPO
+}
+
+' ─────────────────────────────────────────
+' Message Broker
+' ─────────────────────────────────────────
+node "Apache ActiveMQ :61616" as AMQ {
+    queue "sentiment.analysis.request" as Q1
+    queue "sentiment.analysis.response" as Q2
+}
+
+' ─────────────────────────────────────────
+' Backend — aiWorker
+' ─────────────────────────────────────────
+node "aiWorker :8082" as AW {
+    component "AnalysisRequestListener\n(JMS Consumer)" as ARL
+    component "SentimentAnalysisService\n(Spring AI)" as SAS
+    ARL --> SAS
+}
+
+' ─────────────────────────────────────────
+' External Services
+' ─────────────────────────────────────────
+cloud "YouTube Data API" as YT
+cloud "OpenAI API" as OAI
+cloud "Google OAuth 2.0" as GO
+
+database "MongoDB :27017" as MDB
+
+' ─────────────────────────────────────────
+' Connections
+' ─────────────────────────────────────────
+User --> FE : "interacts"
+
+FE --> BK : "REST /api/*\n(HTTP)"
+
+BK --> YT  : "fetch comments\n& video search"
+AC  --> GO : "OAuth 2.0 login"
+
+SHS --> Q1 : "publish chunk\n(JMS)"
+Q2  --> SHS : "receive result\n(JMS)"
+
+Q1  --> ARL : "consume\n(JMS)"
+SAS --> Q2  : "publish response\n(JMS)"
+SAS --> OAI : "sentiment prompt\n(REST)"
+
+REPO --> MDB : "persist"
+
+@enduml
